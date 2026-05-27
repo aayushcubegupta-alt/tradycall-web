@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 80" fill="none">
+  <!-- Rounded rectangle background with Reece brand blue -->
+  <rect width="240" height="80" rx="12" fill="#0A5CA8" />
+  
+  <!-- "reece" in lowercase bold Helvetica-like sans-serif -->
+  <text x="35" y="52" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="36" fill="#FFFFFF" letter-spacing="-0.04em">reece</text>
+  
+  <!-- vertical separator line -->
+  <line x1="135" y1="24" x2="135" y2="56" stroke="#FFFFFF" stroke-width="2" stroke-opacity="0.3" stroke-linecap="round" />
+  
+  <!-- "plumbing" subtext -->
+  <text x="148" y="47" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="800" font-size="11" fill="#FFFFFF" opacity="0.9" letter-spacing="0.22em">PLUMBING</text>
+</svg>

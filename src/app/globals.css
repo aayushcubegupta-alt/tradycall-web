@@ -1,0 +1,142 @@
+@import "tailwindcss";
+
+@theme {
+  --color-navy-dark: #0B1F4D;
+  --color-navy-base: #081225;
+  --color-navy-light: #1E293B;
+  --color-yellow-accent: #FACC15;
+  --color-yellow-hover: #E2B80F;
+  --color-warm-white: #FAF9F6;
+  --color-soft-gray: #F1F5F9;
+  --color-text-subtle: #64748B;
+  --color-text-muted: #94A3B8;
+  
+  --font-sans: var(--font-body), system-ui, -apple-system, sans-serif;
+  --font-heading: var(--font-heading), system-ui, -apple-system, sans-serif;
+  
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-pulse-subtle: pulse-subtle 4s ease-in-out infinite;
+  --animate-marquee: marquee 35s linear infinite;
+  
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+  @keyframes pulse-subtle {
+    0%, 100% { opacity: 0.15; }
+    50% { opacity: 0.35; }
+  }
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+}
+
+/* Marquee animations — must be at global scope, not inside @theme */
+@keyframes marquee-left {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+:root {
+  --background: #FAF9F6;
+  --foreground: #081225;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  min-width: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  letter-spacing: -0.02em;
+}
+
+/* Custom premium dot-grid background mesh overlay */
+.dot-grid {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1.2px, transparent 1.2px);
+  background-size: 24px 24px;
+}
+
+.dot-grid-dark {
+  background-image: radial-gradient(rgba(15, 23, 42, 0.06) 1.2px, transparent 1.2px);
+  background-size: 24px 24px;
+}
+
+/* Glassmorphism styling blocks */
+.glass-card {
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+}
+
+.dark-glass-card {
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* Ambient glow and highlight vectors */
+.yellow-glow {
+  box-shadow: 0 0 40px rgba(250, 204, 21, 0.12);
+}
+
+.blue-glow {
+  box-shadow: 0 0 45px rgba(59, 130, 246, 0.12);
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, #FDFDFD 30%, #94A3B8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-navy {
+  background: linear-gradient(135deg, #0F172A 30%, #1E3A8A 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Custom premium scrollbar styling */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Fine-grain letter spacings and text details */
+.tracking-tight-heading {
+  letter-spacing: -0.03em;
+}
+.text-navy-base { color: var(--color-navy-base); }
+.bg-yellow-accent { background-color: var(--color-yellow-accent); }
+.text-yellow-accent { color: var(--color-yellow-accent); }
+.glass-card { background: rgba(255,255,255,0.65); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.5); box-shadow: 0 4px 30px rgba(0,0,0,0.03); }
+
+/* Radial vignette overlay for cinematic video backgrounds */
+.bg-radial-vignette {
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(8, 18, 37, 0.65) 100%);
+}
+
+/* Subtle bounce animation for SVG arrows */
+@keyframes bounce-subtle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(6px); }
+}
+.animate-bounce-subtle {
+  animation: bounce-subtle 2s ease-in-out infinite;
+}
+
