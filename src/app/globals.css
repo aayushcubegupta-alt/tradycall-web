@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
-/* Force class-based dark mode so it stays in light mode by default */
-@custom-variant dark (&:where(.dark, .dark *));
+/* Bulletproof disable dark mode entirely */
+@custom-variant dark (&:not(*));
 
 
 @theme {
