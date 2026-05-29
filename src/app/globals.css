@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* Force class-based dark mode so it stays in light mode by default */
+@custom-variant dark (&:where(.dark, .dark *));
+
+
 @theme {
   --color-navy-dark: #0B1F4D;
   --color-navy-base: #081225;
