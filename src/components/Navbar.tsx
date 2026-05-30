@@ -135,13 +135,13 @@ export const Navbar: React.FC = () => {
 
       {/* Mobile Menu — full-screen overlay */}
       <div
-        className={`md:hidden fixed inset-0 top-[52px] sm:top-[64px] bg-navy-base/98 backdrop-blur-md border-t border-white/10 transition-all duration-300 ease-in-out z-40 ${
+        className={`md:hidden fixed inset-x-0 bottom-0 top-[52px] sm:top-[64px] bg-navy-base/98 backdrop-blur-md border-t border-white/10 transition-all duration-300 ease-in-out z-40 h-[calc(100vh-52px)] sm:h-[calc(100vh-64px)] ${
           isOpen
             ? "opacity-100 pointer-events-auto translate-y-0"
             : "opacity-0 pointer-events-none -translate-y-2"
         }`}
       >
-        <div className="px-4 pt-6 pb-10 space-y-1 overflow-y-auto h-full">
+        <div className="px-4 pt-6 pb-20 space-y-1 overflow-y-auto h-full no-scrollbar">
           {navLinks.map((link) => {
             const active = isActive(link.href);
             return (

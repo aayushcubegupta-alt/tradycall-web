@@ -177,6 +177,21 @@ export const HowItWorks: React.FC = () => {
                         <p className="text-slate-500 dark:text-slate-400 text-[15px] sm:text-base leading-[1.6] font-medium">
                           {step.description}
                         </p>
+                        
+                        {/* Mobile-only responsive phone frame inline */}
+                        <div className="mt-5 lg:hidden w-full max-w-[230px] aspect-[260/563] rounded-[32px] overflow-hidden border-[4px] border-[#1c1c1e] shadow-lg bg-black relative">
+                          <img
+                            src={
+                              step.id === 0 ? "/step1.png?v=3" :
+                              step.id === 1 ? "/step2.png?v=3" :
+                              step.id === 2 ? "/step3.png?v=3" :
+                              step.id === 3 ? "/step4.png?v=3" :
+                              "/step5.png?v=3"
+                            }
+                            alt={`TradyCall Step ${index + 1} Screen`}
+                            className="w-full h-full object-fill"
+                          />
+                        </div>
                      </div>
                   </div>
                 </div>
