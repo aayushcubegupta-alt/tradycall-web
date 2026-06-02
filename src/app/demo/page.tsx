@@ -1,5 +1,6 @@
 "use client";
 
+import { supabase } from "@/lib/supabase";
 import React, { useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
@@ -33,6 +34,30 @@ export default function BookDemoPage() {
   const [staffCount, setStaffCount] = useState("");
   const [additionalInfo, setAdditionalInfo] = useState("");
 
+  const saveLead = async () => {
+    const { error } = await supabase
+      .from("demo_requests")
+      .insert([
+        {
+          full_name: fullName,
+          business_name: businessName,
+          phone: phoneNumber,
+          email: emailAddress,
+          trade_type: tradeType,
+          missed_calls_per_week: missedCalls,
+          team_size: staffCount,
+          notes: additionalInfo,
+        },
+      ]);
+
+    if (error) {
+      console.error("Supabase Error:", error);
+      return false;
+    }
+
+    return true;
+  };
+
   // Step 2 Time slots state
   const [selectedDate, setSelectedDate] = useState<number | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
@@ -49,13 +74,29 @@ export default function BookDemoPage() {
     "9:00 AM", "10:30 AM", "11:30 AM", "1:00 PM", "2:30 PM", "4:00 PM"
   ];
 
-  const handleNextStep = (e: React.FormEvent) => {
+  const handleNextStep = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!fullName || !businessName || !phoneNumber || !emailAddress || !tradeType || !missedCalls || !staffCount) {
+
+    if (
+      !fullName ||
+      !businessName ||
+      !phoneNumber ||
+      !emailAddress ||
+      !tradeType ||
+      !missedCalls ||
+      !staffCount
+    ) {
       alert("Please fill out all required fields marked with *");
       return;
     }
-    setStep(2);
+
+    const success = await saveLead();
+
+    if (success) {
+      setStep(2);
+    } else {
+      alert("Failed to save booking request.");
+    }
   };
 
   const handleConfirmBooking = () => {
