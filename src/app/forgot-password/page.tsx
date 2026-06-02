@@ -3,18 +3,36 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Mail, ArrowRight, ShieldCheck, ChevronLeft } from "lucide-react";
 import Button from "@/components/ui/Button";
+import { supabase } from "@/lib/supabase";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
-  const [submitted, setSubmitted] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
-    // Forgot password logic not connected yet
+    setErrorMsg(null);
+    setIsLoading(true);
+
+    try {
+      const { data, error } = await supabase.auth.resetPasswordForEmail(email);
+
+      if (error) {
+        setErrorMsg(error.message);
+      } else {
+        router.push(`/reset-password?email=${encodeURIComponent(email)}`);
+      }
+    } catch (err: any) {
+      setErrorMsg(err?.message || "An unexpected error occurred.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -55,71 +73,58 @@ export default function ForgotPasswordPage() {
           {/* Subtle glow edge accent */}
           <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
 
-          {submitted ? (
-            /* Success State */
-            <div className="text-center py-4 space-y-6">
-              <div className="w-16 h-16 rounded-full bg-yellow-accent/10 text-yellow-accent border border-yellow-accent/25 flex items-center justify-center mx-auto shadow-lg">
-                <Mail className="w-8 h-8" />
-              </div>
-              <div className="space-y-2">
-                <h3 className="text-xl sm:text-2xl font-black text-white">Check your email</h3>
-                <p className="text-slate-350 text-xs sm:text-sm font-semibold max-w-sm mx-auto leading-relaxed">
-                  We&apos;ve sent password reset instructions to <strong>{email}</strong>.
-                </p>
-              </div>
-              <div className="pt-4">
-                <Link href="/login" className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-black text-yellow-accent hover:underline uppercase tracking-wider">
-                  <ChevronLeft className="w-4 h-4" /> Back to login
-                </Link>
+          {/* Heading */}
+          <div className="text-center mb-8">
+            <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
+              Reset your password
+            </h2>
+            <p className="text-slate-400 text-xs sm:text-sm font-semibold mt-2">
+              Enter your email address and we&apos;ll send you a password reset code
+            </p>
+          </div>
+
+          {/* Error message banner */}
+          {errorMsg && (
+            <div className="mb-6 p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-200 text-xs font-semibold leading-relaxed">
+              ⚠️ {errorMsg}
+            </div>
+          )}
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Email Field */}
+            <div className="space-y-2">
+              <label className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-slate-300 block">
+                Email Address
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                  <Mail className="w-4.5 h-4.5" />
+                </div>
+                <input
+                  type="email"
+                  required
+                  placeholder="name@business.com.au"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 font-semibold transition-all"
+                />
               </div>
             </div>
-          ) : (
-            /* Request State */
-            <>
-              {/* Heading */}
-              <div className="text-center mb-8">
-                <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
-                  Reset your password
-                </h2>
-                <p className="text-slate-400 text-xs sm:text-sm font-semibold mt-2">
-                  Enter your email address and we&apos;ll send you a recovery link
-                </p>
-              </div>
 
-              {/* Form */}
-              <form onSubmit={handleSubmit} className="space-y-5">
-                {/* Email Field */}
-                <div className="space-y-2">
-                  <label className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-slate-300 block">
-                    Email Address
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
-                      <Mail className="w-4 h-4" />
-                    </div>
-                    <input
-                      type="email"
-                      required
-                      placeholder="name@business.com.au"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 font-semibold transition-all"
-                    />
-                  </div>
-                </div>
-
-                {/* Submit Button */}
-                <div className="pt-2">
-                  <Button
-                    type="submit"
-                    variant="primary"
-                    className="w-full justify-center flex items-center gap-2 font-black py-3.5 rounded-xl text-xs sm:text-sm uppercase tracking-wider shadow-lg shadow-yellow-accent/5 hover:shadow-yellow-accent/15"
-                  >
-                    <span>Send password reset link</span>
-                    <ArrowRight className="w-4.5 h-4.5" />
-                  </Button>
-                </div>
-              </form>
+            {/* Submit Button */}
+            <div className="pt-2">
+              <Button
+                type="submit"
+                variant="primary"
+                disabled={isLoading}
+                className="w-full justify-center flex items-center gap-2 font-black py-3.5 rounded-xl text-xs sm:text-sm uppercase tracking-wider shadow-lg shadow-yellow-accent/5 hover:shadow-yellow-accent/15 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <span>{isLoading ? "Sending code..." : "Send password reset code"}</span>
+                <ArrowRight className="w-4.5 h-4.5" />
+              </Button>
+            </div>
+          </form>
 
               {/* Login Link footer */}
               <div className="mt-8 pt-6 border-t border-white/5 text-center text-xs sm:text-sm font-semibold text-slate-400">
@@ -131,9 +136,7 @@ export default function ForgotPasswordPage() {
                   Log in instead
                 </Link>
               </div>
-            </>
-          )}
-        </motion.div>
+          </motion.div>
       </main>
 
       {/* Footer information */}

@@ -47,7 +47,7 @@ export default function SignupPage() {
       if (error) {
         setErrorMsg(error.message);
       } else {
-        router.push("/dashboard");
+        router.push(`/verify-email?email=${encodeURIComponent(email)}`);
       }
     } catch (err: any) {
       setErrorMsg(err?.message || "An unexpected error occurred during signup.");

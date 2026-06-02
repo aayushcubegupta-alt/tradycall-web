@@ -30,7 +30,13 @@ export default function LoginPage() {
       });
 
       if (error) {
-        setErrorMsg(error.message);
+        if (error.message.toLowerCase().includes("confirm") || error.message.toLowerCase().includes("verify")) {
+          router.push(`/verify-email?email=${encodeURIComponent(email)}`);
+        } else {
+          setErrorMsg(error.message);
+        }
+      } else if (data?.user && !data.user.email_confirmed_at) {
+        router.push(`/verify-email?email=${encodeURIComponent(email)}`);
       } else {
         router.push("/dashboard");
       }
