@@ -1,417 +1,687 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
 import { 
-  ShieldCheck, 
-  ShieldAlert,
-  LogOut, 
-  Zap, 
-  TrendingUp, 
-  MessageSquare, 
   PhoneMissed, 
-  Calendar,
-  CheckCircle,
-  Clock,
+  User, 
+  MessageSquare, 
+  TrendingUp, 
+  CheckCircle2, 
   ArrowRight,
-  RefreshCw
+  MoreHorizontal,
+  Droplet,
+  Flame,
+  Wrench,
+  Hammer,
+  ClipboardList,
+  AlertCircle,
+  ChevronRight,
+  ArrowDownLeft,
+  ArrowUpRight,
+  Settings
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import Button from "@/components/ui/Button";
+import { useDemo } from "./DemoContext";
+import { MOCK_LEADS, MOCK_CONVERSATIONS, MOCK_ACTIVITIES } from "./MockData";
 
-interface UserMetadata {
-  full_name?: string;
-  business_name?: string;
-}
+// Dynamic Lucide icons map
+const serviceIconMap: Record<string, any> = {
+  "Blocked Drain": Droplet,
+  "Hot Water System": Flame,
+  "Bathroom Renovation": Hammer,
+  "Leaking Tap": Wrench,
+  "Toilet Replacement": Wrench,
+  "Ceiling Fan Installation": Hammer,
+  "Switchboard Upgrade": Hammer,
+  "Burst Pipe": Droplet,
+};
+
+const serviceColorMap: Record<string, string> = {
+  "Blocked Drain": "text-blue-500",
+  "Hot Water System": "text-orange-500",
+  "Bathroom Renovation": "text-purple-500",
+  "Leaking Tap": "text-slate-500",
+  "Toilet Replacement": "text-emerald-500",
+  "Ceiling Fan Installation": "text-purple-500",
+  "Switchboard Upgrade": "text-purple-500",
+  "Burst Pipe": "text-blue-500",
+};
+
+// Activity Lucide icons map
+const activityIconMap: Record<string, any> = {
+  "PhoneMissed": PhoneMissed,
+  "MessageSquare": MessageSquare,
+  "User": User,
+};
 
 export default function DashboardPage() {
-  const [user, setUser] = useState<any>(null);
-  const [metadata, setMetadata] = useState<UserMetadata>({});
-  const [isEmailVerified, setIsEmailVerified] = useState(true);
-  const [isLoading, setIsLoading] = useState(true);
-  
-  // Resend Verification State
-  const [resending, setResending] = useState(false);
-  const [resendStatus, setResendStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
-  const [resendErrorMsg, setResendErrorMsg] = useState("");
+  const { businessId, isDemoMode } = useDemo();
+  console.log("DashboardPage render - isDemoMode:", isDemoMode, "businessId:", businessId);
 
-  const router = useRouter();
+  const [leadsList, setLeadsList] = useState<any[]>([]);
+  const [conversationsList, setConversationsList] = useState<any[]>([]);
+  const [activitiesList, setActivitiesList] = useState<any[]>([]);
+  const [missedCallsCount, setMissedCallsCount] = useState(0);
+  const [recoveredCount, setRecoveredCount] = useState(0);
+  const [activeConversationsCount, setActiveConversationsCount] = useState(0);
+  const [isLoadingData, setIsLoadingData] = useState(true);
 
   useEffect(() => {
-    const fetchUser = async () => {
-      setIsLoading(true);
+    if (isDemoMode) {
+      setLeadsList(MOCK_LEADS.slice(0, 5));
+      setConversationsList(MOCK_CONVERSATIONS.slice(0, 5));
+      setActivitiesList(MOCK_ACTIVITIES);
+      setMissedCallsCount(12);
+      setRecoveredCount(8);
+      setActiveConversationsCount(2);
+      setIsLoadingData(false);
+      return;
+    }
+
+    // Reset states for real user mode immediately to prevent stale demo data
+    setLeadsList([]);
+    setConversationsList([]);
+    setActivitiesList([]);
+    setMissedCallsCount(0);
+    setRecoveredCount(0);
+    setActiveConversationsCount(0);
+
+    if (!businessId) {
+      setIsLoadingData(false);
+      return;
+    }
+
+    const fetchDashboardData = async () => {
+      setIsLoadingData(true);
       try {
-        const { data: { user }, error } = await supabase.auth.getUser();
-        if (error || !user) {
-          router.push("/login");
-          return;
+        // 1. Fetch recent leads
+        const { data: leads, error: leadsErr } = await supabase
+          .from("leads")
+          .select("*")
+          .eq("business_id", businessId)
+          .order("created_at", { ascending: false })
+          .limit(5);
+
+        // 2. Fetch recent conversations
+        const { data: convs, error: convsErr } = await supabase
+          .from("conversations")
+          .select("*")
+          .eq("business_id", businessId)
+          .order("last_message_time", { ascending: false })
+          .limit(5);
+
+        // 3. Fetch missed calls for stats
+        const { data: missedCalls, error: mcErr } = await supabase
+          .from("missed_calls")
+          .select("*")
+          .eq("business_id", businessId);
+
+        // 4. Fetch timeline activities
+        const { data: activities, error: actsErr } = await supabase
+          .from("recovery_activities")
+          .select("*")
+          .eq("business_id", businessId)
+          .order("created_at", { ascending: false })
+          .limit(5);
+
+        if (leads) setLeadsList(leads);
+        if (convs) setConversationsList(convs);
+        if (activities) setActivitiesList(activities);
+
+        if (missedCalls) {
+          setMissedCallsCount(missedCalls.length);
+          const recovered = missedCalls.filter(m => m.recovered).length;
+          setRecoveredCount(recovered);
+        } else {
+          setMissedCallsCount(0);
+          setRecoveredCount(0);
         }
 
-        setUser(user);
-        setMetadata(user.user_metadata || {});
-        setIsEmailVerified(!!user.email_confirmed_at);
+        if (convs) {
+          const active = convs.filter(c => c.status === "Active" || c.status === "Replied").length;
+          setActiveConversationsCount(active);
+        } else {
+          setActiveConversationsCount(0);
+        }
       } catch (err) {
-        console.error("Dashboard User Auth Fetch Error:", err);
-        router.push("/login");
+        console.error("Dashboard queries error:", err);
       } finally {
-        setIsLoading(false);
+        setIsLoadingData(false);
       }
     };
 
-    fetchUser();
-  }, [router]);
+    fetchDashboardData();
+  }, [businessId, isDemoMode]);
 
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    router.push("/login");
+  // Compute values
+  const hasData = missedCallsCount > 0 || leadsList.length > 0;
+  const recoveryRate = missedCallsCount > 0 ? Math.round((recoveredCount / missedCallsCount) * 100) : 0;
+
+  // Formatting helpers
+  const formatTimeElapsed = (dateStr: string) => {
+    const d = new Date(dateStr);
+    const diffMs = Date.now() - d.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    if (diffMins < 1) return "Just now";
+    if (diffMins < 60) return `${diffMins} min ago`;
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return `${diffHours} hr${diffHours > 1 ? "s" : ""} ago`;
+    return d.toLocaleDateString();
   };
 
-  const handleResendVerification = async () => {
-    if (!user || !user.email) return;
-    
-    setResending(true);
-    setResendStatus("sending");
-    setResendErrorMsg("");
+  const getInitials = (nameStr: string) => {
+    return nameStr.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase() || "CN";
+  };
 
-    try {
-      const { error } = await supabase.auth.resend({
-        type: "signup",
-        email: user.email,
-        options: {
-          emailRedirectTo: `${window.location.origin}/dashboard`
-        }
-      });
+  const getSvcIcon = (service: string) => {
+    return serviceIconMap[service] || Wrench;
+  };
 
-      if (error) {
-        setResendStatus("error");
-        setResendErrorMsg(error.message);
-      } else {
-        setResendStatus("success");
-      }
-    } catch (err: any) {
-      setResendStatus("error");
-      setResendErrorMsg(err?.message || "Failed to resend verification email.");
-    } finally {
-      setResending(false);
+  const getSvcColor = (service: string) => {
+    return serviceColorMap[service] || "text-slate-500";
+  };
+
+  // Static stats list configuration mapped to dynamic values
+  const stats = [
+    { 
+      label: "Missed Calls Today", 
+      val: String(missedCallsCount), 
+      trend: hasData ? "8% vs yesterday" : "0% vs yesterday", 
+      isPositive: false,
+      color: "bg-[#FEF08A] text-[#854D0E]", // Yellow
+      icon: PhoneMissed
+    },
+    { 
+      label: "Recovered Leads", 
+      val: String(recoveredCount), 
+      trend: hasData ? "33% vs yesterday" : "0% vs yesterday", 
+      isPositive: true,
+      color: "bg-[#DCFCE7] text-[#166534]", // Green
+      icon: User
+    },
+    { 
+      label: "Active Conversations", 
+      val: String(activeConversationsCount), 
+      trend: hasData ? "25% vs yesterday" : "0% vs yesterday", 
+      isPositive: true,
+      color: "bg-[#DBEAFE] text-[#1E40AF]", // Blue
+      icon: MessageSquare
+    },
+    { 
+      label: "Recovery Rate", 
+      val: `${recoveryRate}%`, 
+      trend: hasData ? "12% vs yesterday" : "0% vs yesterday", 
+      isPositive: true,
+      color: "bg-[#F3E8FF] text-[#6B21A8]", // Purple
+      icon: TrendingUp
     }
-  };
+  ];
 
-  if (isLoading) {
+  // Needs Attention items calculated dynamically
+  const tasks = hasData ? [
+    {
+      count: `${leadsList.filter(l => l.status === "New").length} New Leads`,
+      title: "Awaiting Follow-up",
+      desc: "High priority leads",
+      color: "bg-[#FEF08A] text-[#854D0E]", 
+      icon: AlertCircle
+    },
+    {
+      count: `${conversationsList.filter(c => c.status === "Awaiting Reply").length} Conversations`,
+      title: "Awaiting Reply",
+      desc: "Customers waiting on response",
+      color: "bg-[#DBEAFE] text-[#1E40AF]", 
+      icon: MessageSquare
+    },
+    {
+      count: "1 Recovery Workflow",
+      title: "Needs Review",
+      desc: "Check configuration",
+      color: "bg-[#F3E8FF] text-[#6B21A8]", 
+      icon: Settings
+    }
+  ] : [];
+
+  if (isLoadingData) {
     return (
-      <div className="min-h-screen bg-[#081225] flex flex-col items-center justify-center text-white relative font-sans">
-        <div className="absolute inset-0 dot-grid opacity-[0.12] pointer-events-none" />
-        <div className="flex flex-col items-center gap-4">
-          <RefreshCw className="w-10 h-10 text-yellow-accent animate-spin" />
-          <p className="text-sm font-black uppercase tracking-widest text-slate-400">Loading your dashboard...</p>
-        </div>
+      <div className="p-8 flex flex-col items-center justify-center min-h-[300px] text-[#64748B] font-bold text-xs uppercase tracking-widest gap-3">
+        <div className="w-8 h-8 border-4 border-[#0B1F44] border-t-[#FACC15] rounded-full animate-spin" />
+        <span>Loading Dashboard Data...</span>
       </div>
     );
   }
 
-  // Dashboard Stats Mock Data
-  const stats = [
-    { val: "134", label: "Missed Calls", icon: <PhoneMissed className="w-5 h-5 text-rose-500" />, desc: "Total captured" },
-    { val: "132", label: "Replies Sent", icon: <MessageSquare className="w-5 h-5 text-blue-500" />, desc: "Immediate responses" },
-    { val: "98", label: "Leads Qualified", icon: <Zap className="w-5 h-5 text-yellow-accent" />, desc: "Parsed by AI" },
-    { val: "$18,450", label: "Revenue Recovered", icon: <TrendingUp className="w-5 h-5 text-emerald-500" />, desc: "Booked jobs", highlight: true }
-  ];
-
-  // Dashboard Lead Feed Mock Data
-  const leads = [
-    { name: "Sarah Jenkins", trade: "Burst laundry pipe", location: "Pitt St, Sydney", value: "$850", time: "12 mins ago", status: "Auto-Booked" },
-    { name: "David Miller", trade: "Hot water replacement", location: "Manly, NSW", value: "$1,850", time: "45 mins ago", status: "Qualified" },
-    { name: "Cooper Brown", trade: "Switchboard upgrade", location: "Carlton, VIC", value: "$680", time: "2 hrs ago", status: "SMS Sent" }
-  ];
-
   return (
-    <div className="min-h-screen bg-[#081225] text-white flex flex-col justify-between relative overflow-hidden select-none font-sans">
-      {/* Dynamic premium ambient glows & dot-grid */}
-      <div className="absolute inset-0 dot-grid opacity-[0.12] pointer-events-none z-0" />
-      <div className="absolute top-[-10%] right-[-10%] w-[550px] h-[550px] bg-blue-600/10 rounded-full blur-[140px] pointer-events-none z-0" />
-      <div className="absolute bottom-[-10%] left-[-10%] w-[450px] h-[450px] bg-yellow-accent/5 rounded-full blur-[120px] pointer-events-none z-0" />
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-[1600px] mx-auto text-left animate-fade-in">
 
-      <div className="relative z-10 flex flex-col flex-grow">
-        
-        {/* ─── 1. DYNAMIC VERIFICATION BANNER ─── */}
-        <AnimatePresence>
-          {!isEmailVerified && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              className="bg-amber-500/10 border-b border-amber-500/20 backdrop-blur-md relative z-50 text-left"
-            >
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 sm:py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs sm:text-sm font-semibold">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-amber-500/15 border border-amber-500/25 flex items-center justify-center shrink-0 text-amber-500">
-                    <ShieldAlert className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <span className="text-amber-400 font-bold block sm:inline">Action Required: </span>
-                    <span className="text-slate-300">Your email address is unverified. Please confirm your account to activate live call intercepts.</span>
-                  </div>
-                </div>
-                
-                {/* Resend button block */}
-                <div className="shrink-0 flex items-center gap-4 pl-11 sm:pl-0">
-                  {resendStatus === "success" ? (
-                    <span className="text-emerald-400 font-black flex items-center gap-1">
-                      ✓ Verification email resent!
-                    </span>
-                  ) : (
-                    <button
-                      onClick={handleResendVerification}
-                      disabled={resending}
-                      className="text-yellow-accent font-black hover:text-yellow-hover hover:underline focus:outline-none cursor-pointer flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {resending ? (
-                        <>
-                          <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                          Resending...
-                        </>
-                      ) : (
-                        "Resend verification email"
-                      )}
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              {/* Error notice */}
-              {resendStatus === "error" && (
-                <div className="max-w-7xl mx-auto px-4 pb-3 pl-15 text-xs text-rose-400 font-bold">
-                  ⚠️ Error: {resendErrorMsg}
-                </div>
-              )}
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* ─── 2. DASHBOARD NAVIGATION HEADER ─── */}
-        <header className="border-b border-white/5 bg-[#0b1f4d]/20 backdrop-blur-md py-4 sm:py-5">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-            
-            {/* Logo */}
-            <Link href="/" className="flex items-center space-x-2 shrink-0">
-              <Image
-                src="/tradycall_logo_v2.png"
-                alt="TradyCall Logo"
-                width={130}
-                height={39}
-                priority
-                className="h-8 sm:h-9 w-auto object-contain"
-              />
-            </Link>
-
-            {/* Profile & Sign out */}
-            <div className="flex items-center gap-4">
-              
-              {/* User Email Indicator */}
-              <span className="hidden sm:inline text-xs font-bold text-slate-400">
-                {user?.email}
-              </span>
-              
-              {/* Sign out */}
-              <button
-                onClick={handleSignOut}
-                className="p-2 sm:px-4 sm:py-2.5 rounded-xl border border-white/10 hover:border-rose-500/20 hover:bg-rose-500/5 hover:text-rose-400 transition-all text-slate-300 text-xs sm:text-sm font-bold flex items-center gap-2 cursor-pointer focus:outline-none"
-              >
-                <LogOut className="w-4 h-4" />
-                <span className="hidden sm:inline">Sign Out</span>
-              </button>
-            </div>
+      {/* ─── 1. "WELCOME TO TRADYCALL" ONBOARDING BANNER ─── */}
+      <section className="bg-white border border-[#E2E8F0] rounded-[24px] p-6 shadow-sm flex flex-col xl:flex-row xl:items-center justify-between gap-6 relative">
+        <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-5 flex-grow">
+          {/* Clipboard Icon */}
+          <div className="w-14 h-14 rounded-2xl bg-[#FFF9E6] border border-[#FDE047] flex items-center justify-center shrink-0">
+            <ClipboardList className="w-7 h-7 text-[#CA8A04]" />
           </div>
-        </header>
-
-        {/* ─── 3. MAIN DASHBOARD CONTENT ─── */}
-        <main className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full py-8 sm:py-12 space-y-8 sm:space-y-10">
           
-          {/* Dashboard Welcome Profile Summary */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-[#0b1f4d]/25 border border-white/5 rounded-3xl p-6 sm:p-8 shadow-xl relative text-left">
-            <div className="absolute top-0 right-0 w-[180px] h-[180px] bg-yellow-accent/5 rounded-full blur-[50px] pointer-events-none" />
-            
-            {/* User Title Info */}
-            <div className="space-y-2">
-              <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-                Good morning, {metadata.full_name || "Tradie"}! 👋
-              </h2>
-              <p className="text-slate-450 text-xs sm:text-sm font-semibold flex flex-wrap items-center gap-1.5">
-                <span>Answering missed calls for</span>
-                <strong className="text-white font-extrabold">{metadata.business_name || "your trade business"}</strong>
+          <div className="space-y-4 flex-grow text-left">
+            <div className="space-y-1">
+              <h2 className="text-lg font-black text-[#0B1F44]">Welcome to TradyCall</h2>
+              <p className="text-xs text-[#64748B] font-bold">
+                {hasData 
+                  ? "Complete your setup to start recovering missed jobs automatically."
+                  : "No missed calls have been recovered yet. Connect your business number to begin."
+                }
               </p>
             </div>
 
-            {/* Verification Status Indicator Badge */}
-            <div className="shrink-0 flex items-center gap-3 bg-white/[0.02] border border-white/10 rounded-2xl p-3 sm:px-4">
-              <div className="text-left">
-                <span className="text-[10px] text-slate-500 font-bold uppercase block mb-0.5 leading-none">
-                  Verification Status
-                </span>
-                {isEmailVerified ? (
-                  <span className="text-xs font-black text-emerald-450 flex items-center gap-1">
-                    <CheckCircle className="w-3.5 h-3.5 fill-emerald-500/10 text-emerald-450 shrink-0" />
-                    Verified Partner
-                  </span>
-                ) : (
-                  <span className="text-xs font-black text-amber-500 flex items-center gap-1">
-                    <ShieldAlert className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                    Unverified Email
-                  </span>
-                )}
+            {/* Progress Bar Container */}
+            <div className="max-w-md space-y-1.5">
+              <div className="flex justify-between text-[10px] font-black text-[#CA8A04] uppercase tracking-wider">
+                <span>20% Complete</span>
+              </div>
+              <div className="w-full bg-[#F1F5F9] h-2 rounded-full overflow-hidden">
+                <div className="bg-[#FACC15] h-full w-[20%] rounded-full" />
               </div>
             </div>
           </div>
+        </div>
 
-          {/* Stats Analytics Grid */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-            {stats.map((stat, idx) => (
-              <div 
-                key={idx} 
-                className={`bg-[#0b1f4d]/25 border rounded-3xl p-5 sm:p-6 shadow-md text-left flex flex-col justify-between min-h-[120px] sm:min-h-[140px] relative ${
-                  stat.highlight ? "border-yellow-accent/20 bg-yellow-accent/[0.01]" : "border-white/5"
-                }`}
-              >
-                {stat.highlight && (
-                  <div className="absolute top-0 right-0 w-24 h-24 bg-yellow-accent/5 rounded-full blur-2xl pointer-events-none" />
-                )}
-                <div className="flex justify-between items-start">
-                  <span className="text-[10px] sm:text-xs font-black text-slate-450 uppercase tracking-wide leading-none">
-                    {stat.label}
-                  </span>
-                  <div className="p-1.5 rounded-lg bg-white/[0.03] border border-white/10 shrink-0">
-                    {stat.icon}
-                  </div>
-                </div>
-                <div className="space-y-0.5 pt-3">
-                  <span className={`text-xl sm:text-2xl font-black block leading-none ${
-                    stat.highlight ? "text-yellow-accent" : "text-white"
-                  }`}>
+        {/* Step checklist */}
+        <div className="flex flex-col md:flex-row md:items-center gap-4 xl:gap-8 shrink-0 text-xs font-bold text-[#64748B] border-t xl:border-t-0 xl:border-l border-[#E2E8F0] pt-6 xl:pt-0 xl:pl-8">
+          <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:flex xl:flex-col gap-2 xl:gap-2.5 text-left">
+            <li className="flex items-center gap-2 text-[#166534]">
+              <CheckCircle2 className="w-4.5 h-4.5 text-[#166534] fill-[#DCFCE7]" />
+              <span>Account Created</span>
+            </li>
+            <li className="flex items-center gap-2">
+              <div className="w-4 h-4 rounded-full border border-slate-300" />
+              <span>Connect Business Number</span>
+            </li>
+            <li className="flex items-center gap-2">
+              <div className="w-4 h-4 rounded-full border border-slate-300" />
+              <span>Configure SMS Recovery</span>
+            </li>
+            <li className="flex items-center gap-2">
+              <div className="w-4 h-4 rounded-full border border-slate-300" />
+              <span>Test Recovery Workflow</span>
+            </li>
+            <li className="flex items-center gap-2">
+              <div className="w-4 h-4 rounded-full border border-slate-300" />
+              <span>Activate TradyCall</span>
+            </li>
+          </ul>
+
+          <div className="shrink-0 pt-2 md:pt-0 flex flex-wrap gap-2.5">
+            <Button
+              variant="primary"
+              className="bg-[#FACC15] text-[#0B1F44] hover:bg-[#Eab308] border-none px-6 py-3.5 rounded-xl font-black text-xs uppercase tracking-wider shadow-sm transition-all"
+            >
+              Connect Business Number
+            </Button>
+            <button
+              onClick={() => window.open("https://calendly.com/tradycall/demo", "_blank")}
+              className="bg-white hover:bg-slate-50 text-[#0B1F44] border-2 border-[#0B1F44] px-6 py-3 rounded-xl font-black text-xs uppercase tracking-wider shadow-sm transition-all cursor-pointer font-bold"
+            >
+              Book a Demo
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── 2. 4-COLUMN STATS ANALYTICS GRID ─── */}
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        {stats.map((stat, idx) => {
+          const Icon = stat.icon;
+          return (
+            <div key={idx} className="bg-white border border-[#E2E8F0] rounded-[20px] p-5 shadow-sm flex items-start justify-between min-h-[120px]">
+              <div className="space-y-4 text-left">
+                <span className="text-xs font-black text-[#64748B] uppercase tracking-wide block leading-none">
+                  {stat.label}
+                </span>
+                <div className="space-y-1.5">
+                  <span className="text-2xl sm:text-3xl font-black text-[#0B1F44] block leading-none">
                     {stat.val}
                   </span>
-                  <span className="text-[9px] sm:text-[10px] font-bold text-slate-500 leading-none">
-                    {stat.desc}
+                  
+                  {/* Trend Indicator */}
+                  <span className={`text-[10px] font-extrabold flex items-center gap-0.5 leading-none ${
+                    stat.isPositive ? "text-[#166534]" : "text-[#991B1B]"
+                  }`}>
+                    {stat.isPositive ? (
+                      <ArrowUpRight className="w-3.5 h-3.5 shrink-0" />
+                    ) : (
+                      <ArrowDownLeft className="w-3.5 h-3.5 shrink-0" />
+                    )}
+                    <span>{stat.trend}</span>
                   </span>
                 </div>
               </div>
-            ))}
+
+              {/* Icon background bubble */}
+              <div className={`w-10 h-10 rounded-xl ${stat.color} flex items-center justify-center shrink-0`}>
+                <Icon className="w-5 h-5" />
+              </div>
+            </div>
+          );
+        })}
+      </section>
+
+      {/* ─── 3. DOUBLE-PANE WORKSPACE ─── */}
+      <section className="grid grid-cols-1 xl:grid-cols-12 gap-6 sm:gap-8 items-start">
+        
+        {/* LEFT COLUMN: Recents Logs Pane */}
+        <div className="xl:col-span-8 space-y-6">
+          
+          {/* Recent Leads Table */}
+          <div className="bg-white border border-[#E2E8F0] rounded-[24px] p-6 shadow-sm space-y-5">
+            <div className="flex justify-between items-center border-b border-[#E2E8F0] pb-4">
+              <div>
+                <h3 className="text-base sm:text-lg font-black text-[#0B1F44] tracking-tight">
+                  Recent Leads
+                </h3>
+              </div>
+              <Link 
+                href="/dashboard/leads" 
+                className="text-xs font-black text-blue-600 hover:text-blue-700 hover:underline"
+              >
+                View all leads
+              </Link>
+            </div>
+
+            {/* Custom Table layout */}
+            <div className="overflow-x-auto">
+              {leadsList.length === 0 ? (
+                <div className="py-12 text-center text-xs font-bold text-slate-400">
+                  No leads recovered yet. Connected calls will appear here.
+                </div>
+              ) : (
+                <table className="w-full text-xs font-bold text-[#64748B] border-collapse">
+                  <thead>
+                    <tr className="border-b border-[#E2E8F0] text-[10px] uppercase text-slate-400 tracking-wider text-left">
+                      <th className="pb-3 font-black">Customer</th>
+                      <th className="pb-3 font-black">Service Needed</th>
+                      <th className="pb-3 font-black">Status</th>
+                      <th className="pb-3 font-black text-right">Est. Job Value</th>
+                      <th className="pb-3 font-black text-right">Last Contact</th>
+                      <th className="pb-3 font-black text-center w-12">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#E2E8F0]">
+                    {leadsList.map((lead, idx) => {
+                      const SvcIcon = getSvcIcon(lead.service);
+                      const iconCol = getSvcColor(lead.service);
+                      return (
+                        <tr key={lead.id || idx} className="hover:bg-slate-50/50 transition-colors">
+                          {/* Customer Column */}
+                          <td className="py-3.5 pr-2">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-xl bg-slate-100 text-[#0B1F44] flex items-center justify-center font-black shrink-0 text-[10px]">
+                                {getInitials(lead.name)}
+                              </div>
+                              <div className="text-left leading-tight">
+                                <span className="text-[#0f172a] font-black block">{lead.name}</span>
+                                <span className="text-[10px] text-slate-400 font-bold block mt-0.5">{lead.phone}</span>
+                              </div>
+                            </div>
+                          </td>
+
+                          {/* Service Column */}
+                          <td className="py-3.5 pr-2">
+                            <div className="flex items-center gap-2 text-[#0f172a]">
+                              <SvcIcon className={`w-4 h-4 shrink-0 ${iconCol}`} />
+                              <span>{lead.service}</span>
+                            </div>
+                          </td>
+
+                          {/* Status Column */}
+                          <td className="py-3.5 pr-2">
+                            <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
+                              lead.status === "New" 
+                                ? "bg-[#FEF08A] text-[#854D0E]" 
+                                : lead.status === "Contacted" 
+                                ? "bg-[#DBEAFE] text-[#1E40AF]" 
+                                : "bg-[#DCFCE7] text-[#166534]"
+                            }`}>
+                              {lead.status}
+                            </span>
+                          </td>
+
+                          {/* Value Column */}
+                          <td className="py-3.5 pr-2 text-right text-[#0f172a] font-black">
+                            ${lead.value}
+                          </td>
+
+                          {/* Time Column */}
+                          <td className="py-3.5 pr-2 text-right text-slate-400">
+                            {formatTimeElapsed(lead.last_contact || lead.created_at)}
+                          </td>
+
+                          {/* Actions Column */}
+                          <td className="py-3.5 text-center">
+                            <button className="p-1 rounded-lg hover:bg-slate-100 text-slate-400 cursor-pointer">
+                              <MoreHorizontal className="w-4.5 h-4.5" />
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              )}
+            </div>
+
+            <div className="text-center pt-2">
+              <Link 
+                href="/dashboard/leads" 
+                className="text-xs font-black text-blue-600 hover:text-blue-700 hover:underline"
+              >
+                View all leads
+              </Link>
+            </div>
+
           </div>
 
-          {/* Detailed Leads Dispatch Feed Mock Table */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start">
-            
-            {/* Live Leads Activity Feed list */}
-            <div className="lg:col-span-8 bg-[#0b1f4d]/20 border border-white/5 rounded-3xl p-6 sm:p-8 shadow-xl text-left space-y-6">
-              <div className="flex justify-between items-center border-b border-white/5 pb-4">
-                <div>
-                  <h3 className="text-base sm:text-lg font-black text-white tracking-tight">
-                    Recent Lead Recovery Feed
-                  </h3>
-                  <p className="text-slate-500 text-[10px] sm:text-xs font-semibold">
-                    Real-time missed call qualification captures
-                  </p>
-                </div>
-                <div className="flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-full text-[9px] font-black text-emerald-400">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  Live Feeds
-                </div>
+          {/* Recent Conversations Table */}
+          <div className="bg-white border border-[#E2E8F0] rounded-[24px] p-6 shadow-sm space-y-5">
+            <div className="flex justify-between items-center border-b border-[#E2E8F0] pb-4">
+              <div>
+                <h3 className="text-base sm:text-lg font-black text-[#0B1F44] tracking-tight">
+                  Recent Conversations
+                </h3>
               </div>
+              <Link 
+                href="/dashboard/conversations" 
+                className="text-xs font-black text-blue-600 hover:text-blue-700 hover:underline"
+              >
+                View all conversations
+              </Link>
+            </div>
 
-              {/* Feed Items */}
-              <div className="space-y-4">
-                {leads.map((lead, idx) => (
-                  <div 
-                    key={idx} 
-                    className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 flex flex-col sm:flex-row justify-between sm:items-center gap-4 hover:bg-white/[0.04] transition-all"
-                  >
-                    <div className="flex items-start gap-3.5">
-                      <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center shrink-0 text-blue-450 text-xs font-black">
-                        💬
+            <div className="overflow-x-auto">
+              {conversationsList.length === 0 ? (
+                <div className="py-12 text-center text-xs font-bold text-slate-400">
+                  No conversations yet.
+                </div>
+              ) : (
+                <table className="w-full text-xs font-bold text-[#64748B] border-collapse">
+                  <thead>
+                    <tr className="border-b border-[#E2E8F0] text-[10px] uppercase text-slate-400 tracking-wider text-left">
+                      <th className="pb-3 font-black">Customer</th>
+                      <th className="pb-3 font-black">Service</th>
+                      <th className="pb-3 font-black">Last Message</th>
+                      <th className="pb-3 font-black text-right">Time</th>
+                      <th className="pb-3 font-black text-right">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#E2E8F0]">
+                    {conversationsList.map((conv, idx) => {
+                      const colorStyle = 
+                        conv.status === "New" 
+                          ? "bg-[#FEF08A] text-[#854D0E]" 
+                          : conv.status === "Replied"
+                          ? "bg-[#DCFCE7] text-[#166534]"
+                          : conv.status === "Active"
+                          ? "bg-[#DBEAFE] text-[#1E40AF]"
+                          : "bg-[#F3E8FF] text-[#6B21A8]"; // purple
+
+                      return (
+                        <tr key={conv.id || idx} className="hover:bg-slate-50/50 transition-colors">
+                          <td className="py-3.5 pr-2">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-xl bg-slate-100 text-[#0B1F44] flex items-center justify-center font-black shrink-0 text-[10px]">
+                                {getInitials(conv.name)}
+                              </div>
+                              <div className="text-left leading-tight">
+                                <span className="text-[#0f172a] font-black block">{conv.name}</span>
+                                <span className="text-[10px] text-slate-400 font-bold block mt-0.5">{conv.phone}</span>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="py-3.5 pr-2 text-[#0f172a]">
+                            {conv.service}
+                          </td>
+                          <td className="py-3.5 pr-2 max-w-xs truncate text-[#0f172a] italic">
+                            &ldquo;{conv.last_message}&rdquo;
+                          </td>
+                          <td className="py-3.5 pr-2 text-right text-slate-400">
+                            {formatTimeElapsed(conv.last_message_time || conv.created_at)}
+                          </td>
+                          <td className="py-3.5 text-right">
+                            <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${colorStyle}`}>
+                              {conv.status}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              )}
+            </div>
+
+            <div className="text-center pt-2">
+              <Link 
+                href="/dashboard/conversations" 
+                className="text-xs font-black text-blue-600 hover:text-blue-700 hover:underline"
+              >
+                View all conversations
+              </Link>
+            </div>
+          </div>
+
+        </div>
+
+        {/* RIGHT COLUMN: timelines and quick cues panel */}
+        <div className="xl:col-span-4 space-y-6">
+          
+          {/* Lead Recovery Activity Feed */}
+          <div className="bg-white border border-[#E2E8F0] rounded-[24px] p-6 shadow-sm space-y-6">
+            <div className="border-b border-[#E2E8F0] pb-4 text-left">
+              <h3 className="text-base sm:text-lg font-black text-[#0B1F44] tracking-tight">
+                Lead Recovery Activity
+              </h3>
+            </div>
+
+            {/* Timeline Wrapper */}
+            {activitiesList.length === 0 ? (
+              <div className="py-8 text-center text-xs font-bold text-slate-400">
+                No activity recorded yet.
+              </div>
+            ) : (
+              <div className="space-y-6 relative pl-6 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-[2px] before:bg-[#E2E8F0] text-left">
+                {activitiesList.map((act, idx) => {
+                  const ActIcon = activityIconMap[act.icon] || MessageSquare;
+                  const timeText = new Date(act.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                  return (
+                    <div key={act.id || idx} className="relative space-y-1">
+                      {/* Timeline dot */}
+                      <div className={`absolute -left-8 top-0.5 w-6 h-6 rounded-full ${act.color} flex items-center justify-center shrink-0 border-2 border-white shadow-sm`}>
+                        <ActIcon className="w-3.5 h-3.5" />
                       </div>
-                      <div>
-                        <h4 className="text-xs sm:text-sm font-black text-white flex items-center gap-2">
-                          {lead.name}
-                          <span className="inline-flex items-center gap-1 text-[8px] font-bold text-slate-400 bg-white/5 px-2 py-0.5 rounded-full">
-                            <Clock className="w-2.5 h-2.5 text-slate-400" />
-                            {lead.time}
-                          </span>
+                      
+                      <div className="flex items-center gap-1.5 text-[10px] font-extrabold text-[#64748B] leading-none uppercase">
+                        <span>{timeText}</span>
+                      </div>
+                      <div className="space-y-0.5">
+                        <h4 className="text-xs font-black text-[#0b1f44] leading-tight">
+                          {act.title}
                         </h4>
-                        <p className="text-[10px] sm:text-xs font-semibold text-slate-400 mt-1 leading-snug">
-                          <strong className="text-rose-400 font-bold">{lead.trade}</strong> — {lead.location}
+                        <p className="text-[11px] font-bold text-slate-400 leading-normal">
+                          {act.desc}
                         </p>
                       </div>
                     </div>
-
-                    <div className="flex items-center justify-between sm:justify-end gap-5 pl-13 sm:pl-0">
-                      <div className="text-left sm:text-right shrink-0">
-                        <span className="text-[9px] text-slate-500 font-bold uppercase block leading-none mb-1">Estimated Value</span>
-                        <span className="text-xs sm:text-sm font-black text-yellow-accent leading-none">{lead.value}</span>
-                      </div>
-                      <span className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider text-center shrink-0 border ${
-                        lead.status === "Auto-Booked" 
-                          ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-450" 
-                          : lead.status === "Qualified" 
-                          ? "bg-blue-600/15 border-blue-500/20 text-blue-400" 
-                          : "bg-white/5 border-white/10 text-slate-300"
-                      }`}>
-                        {lead.status}
-                      </span>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
+            )}
+
+            <div className="text-center pt-2 border-t border-[#E2E8F0]">
+              <Link 
+                href="/dashboard/leads" 
+                className="text-xs font-black text-blue-600 hover:text-blue-700 hover:underline"
+              >
+                View full activity
+              </Link>
             </div>
-
-            {/* Quick Actions Side panel */}
-            <div className="lg:col-span-4 bg-[#0b1f4d]/20 border border-white/5 rounded-3xl p-6 sm:p-8 shadow-xl text-left space-y-6">
-              <div>
-                <h3 className="text-base sm:text-lg font-black text-white tracking-tight">
-                  Quick Settings
-                </h3>
-                <p className="text-slate-500 text-[10px] sm:text-xs font-semibold">
-                  Configure answering templates
-                </p>
-              </div>
-
-              {/* Action options */}
-              <div className="space-y-4 text-xs font-bold text-slate-300">
-                <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 space-y-2">
-                  <span className="text-[9px] text-slate-500 font-black uppercase tracking-wider block">Answering Mode</span>
-                  <div className="flex justify-between items-center bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-slate-200">
-                    <span className="flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
-                      After-Hours Active
-                    </span>
-                    <span className="text-[10px] font-black text-yellow-accent uppercase tracking-widest cursor-pointer">Configure</span>
-                  </div>
-                </div>
-
-                <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 space-y-2.5">
-                  <span className="text-[9px] text-slate-500 font-black uppercase tracking-wider block">Trade Notifications</span>
-                  <div className="flex items-center justify-between text-slate-400 text-xs">
-                    <span>SMS Alerts to Team</span>
-                    <span className="text-emerald-450 font-black uppercase tracking-wider">ON</span>
-                  </div>
-                  <div className="flex items-center justify-between text-slate-400 text-xs pt-1">
-                    <span>Weekly PDF summaries</span>
-                    <span className="text-emerald-450 font-black uppercase tracking-wider">ON</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
           </div>
 
-        </main>
-      </div>
+          {/* Needs Attention Alert queues */}
+          <div className="bg-white border border-[#E2E8F0] rounded-[24px] p-6 shadow-sm space-y-5">
+            <div className="border-b border-[#E2E8F0] pb-4 text-left">
+              <h3 className="text-base sm:text-lg font-black text-[#0B1F44] tracking-tight">
+                Needs Attention
+              </h3>
+            </div>
 
-      {/* Footer information */}
-      <footer className="relative z-10 w-full py-6 text-center text-[10px] font-black tracking-widest text-slate-500 uppercase flex items-center justify-center gap-2 border-t border-white/5">
-        <ShieldCheck className="w-4 h-4 text-blue-500" />
-        <span>Secure Tradie Dashboard • TradyCall Automation</span>
-      </footer>
+            <div className="space-y-3">
+              {tasks.length === 0 ? (
+                <div className="py-6 text-center text-xs font-black text-[#166534] bg-[#DCFCE7] rounded-xl border border-green-200">
+                  🎉 All caught up!
+                </div>
+              ) : (
+                tasks.map((task, idx) => {
+                  const TaskIcon = task.icon;
+                  return (
+                    <div 
+                      key={idx} 
+                      className="bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl p-4 flex items-center justify-between gap-4 hover:border-[#CBD5E1] transition-all cursor-pointer text-left"
+                    >
+                      <div className="flex items-center gap-3.5">
+                        <div className={`w-9 h-9 rounded-xl ${task.color} flex items-center justify-center shrink-0`}>
+                          <TaskIcon className="w-4.5 h-4.5" />
+                        </div>
+                        <div className="leading-tight">
+                          <span className="text-xs font-black text-[#0B1F44]">
+                            <strong className="font-extrabold">{task.count}</strong> {task.title}
+                          </span>
+                          <span className="text-[10px] text-slate-400 font-bold block mt-0.5">
+                            {task.desc}
+                          </span>
+                        </div>
+                      </div>
+                      <ChevronRight className="w-4.5 h-4.5 text-[#64748B] shrink-0" />
+                    </div>
+                  );
+                })
+              )}
+            </div>
+
+            <div className="text-center pt-2 border-t border-[#E2E8F0]">
+              <Link 
+                href="/dashboard/leads" 
+                className="text-xs font-black text-blue-600 hover:text-blue-700 hover:underline"
+              >
+                View all tasks
+              </Link>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
     </div>
   );
 }
