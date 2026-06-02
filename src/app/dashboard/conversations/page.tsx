@@ -10,6 +10,7 @@ import {
   ClipboardList,
   SlidersHorizontal,
   ChevronDown,
+  ChevronLeft,
   CheckCheck,
   MoreVertical,
   Phone,
@@ -224,7 +225,9 @@ export default function ConversationsPage() {
       <div className="flex-grow flex min-h-0 overflow-hidden">
 
         {/* LEFT: Recovered Leads list */}
-        <div className="w-full max-w-[380px] border-r border-[#E2E8F0] bg-white flex flex-col min-h-0">
+        <div className={`w-full xl:max-w-[380px] border-r border-[#E2E8F0] bg-white flex flex-col min-h-0 shrink-0 ${
+          activeChatId ? "hidden xl:flex" : "flex"
+        }`}>
           
           <div className="px-4 pt-4 pb-2.5 flex items-center justify-between shrink-0">
             <h3 className="text-sm font-black text-[#0B1F44]">Recovered Leads</h3>
@@ -307,7 +310,9 @@ export default function ConversationsPage() {
         </div>
 
         {/* RIGHT: Chat pane */}
-        <div className="flex-grow flex flex-col min-h-0 bg-[#FAFBFC]">
+        <div className={`flex-grow flex flex-col min-h-0 bg-[#FAFBFC] ${
+          activeChatId ? "flex" : "hidden xl:flex"
+        }`}>
           
           {!active ? (
             <div className="flex-grow flex flex-col items-center justify-center p-8 text-center text-slate-450 text-xs font-bold gap-2">
@@ -319,6 +324,13 @@ export default function ConversationsPage() {
               {/* Chat header */}
               <div className="bg-white border-b border-[#E2E8F0] px-5 py-4 flex items-center justify-between shrink-0 text-left">
                 <div className="flex items-center gap-3.5">
+                  {/* Back button on mobile */}
+                  <button
+                    onClick={() => setActiveChatId(null)}
+                    className="xl:hidden p-1.5 rounded-lg border border-[#E2E8F0] text-[#0B1F44] hover:bg-[#F8FAFC] transition-colors cursor-pointer mr-2 shrink-0"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
                   <div className={`w-11 h-11 rounded-full ${getAvatarStyle(active.name).bg} ${getAvatarStyle(active.name).text} flex items-center justify-center font-bold text-sm shrink-0 select-none`}>
                     {getInitials(active.name)}
                   </div>

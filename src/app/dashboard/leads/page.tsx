@@ -414,7 +414,11 @@ export default function LeadsPage() {
         </div>
 
         {/* RIGHT COLUMN: Lead Detail Panel (cols 4) */}
-        <div className="xl:col-span-4 bg-white border border-[#E2E8F0] rounded-[24px] shadow-md flex flex-col min-h-[600px] overflow-hidden text-left relative">
+        <div className={`xl:col-span-4 bg-white border border-[#E2E8F0] rounded-[24px] shadow-md flex flex-col min-h-[600px] xl:min-h-0 overflow-hidden text-left relative ${
+          selectedLeadId 
+            ? "fixed inset-0 z-50 xl:relative xl:inset-auto xl:z-auto xl:flex" 
+            : "hidden xl:flex"
+        }`}>
           
           {!selectedLead ? (
             <div className="flex-grow flex flex-col items-center justify-center p-8 text-center text-slate-400 text-xs font-bold gap-2">

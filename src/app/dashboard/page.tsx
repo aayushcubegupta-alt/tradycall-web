@@ -312,16 +312,16 @@ export default function DashboardPage() {
             </li>
           </ul>
 
-          <div className="shrink-0 pt-2 md:pt-0 flex flex-wrap gap-2.5">
+          <div className="pt-4 md:pt-0 flex flex-col sm:flex-row gap-2.5 w-full sm:w-auto">
             <Button
               variant="primary"
-              className="bg-[#FACC15] text-[#0B1F44] hover:bg-[#Eab308] border-none px-6 py-3.5 rounded-xl font-black text-xs uppercase tracking-wider shadow-sm transition-all"
+              className="w-full sm:w-auto bg-[#FACC15] text-[#0B1F44] hover:bg-[#Eab308] border-none px-6 py-3.5 rounded-xl font-black text-xs uppercase tracking-wider shadow-sm transition-all text-center flex justify-center"
             >
               Connect Business Number
             </Button>
             <button
               onClick={() => window.open("https://calendly.com/tradycall/demo", "_blank")}
-              className="bg-white hover:bg-slate-50 text-[#0B1F44] border-2 border-[#0B1F44] px-6 py-3 rounded-xl font-black text-xs uppercase tracking-wider shadow-sm transition-all cursor-pointer font-bold"
+              className="w-full sm:w-auto bg-white hover:bg-slate-50 text-[#0B1F44] border-2 border-[#0B1F44] px-6 py-3.5 rounded-xl font-black text-xs uppercase tracking-wider shadow-sm transition-all cursor-pointer font-bold text-center"
             >
               Book a Demo
             </button>

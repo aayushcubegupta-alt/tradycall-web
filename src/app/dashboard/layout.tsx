@@ -220,10 +220,16 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
           })}
         </nav>
 
-        <div className="p-4 border-t border-[#E2E8F0] space-y-2">
+        <div className="p-4 border-t border-[#E2E8F0] space-y-2.5">
+          <button
+            onClick={() => window.open("https://calendly.com/tradycall/demo", "_blank")}
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer border-none shadow-sm"
+          >
+            Book a Demo
+          </button>
           <button
             onClick={handleSignOut}
-            className="w-full flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-black text-rose-500 hover:bg-rose-50 transition-all"
+            className="w-full flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-black text-rose-500 hover:bg-rose-50 transition-all cursor-pointer bg-transparent border-none"
           >
             <LogOut className="w-5 h-5" />
             Sign Out
@@ -263,7 +269,7 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
             {/* Book a Demo CTA */}
             <button
               onClick={() => window.open("https://calendly.com/tradycall/demo", "_blank")}
-              className="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer shadow-sm border border-transparent"
+              className="hidden sm:block px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer shadow-sm border border-transparent"
             >
               Book a Demo
             </button>
@@ -272,16 +278,18 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
             {isDemoMode ? (
               <button
                 onClick={() => setDemoMode(false)}
-                className="px-3 py-2 bg-[#0b1f44] hover:bg-[#1a2d52] text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer shadow-sm border border-transparent"
+                className="px-3 py-2 bg-[#0b1f44] hover:bg-[#1a2d52] text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer shadow-sm border border-transparent shrink-0"
               >
-                Return to My Dashboard
+                <span className="hidden sm:inline">Return to My Dashboard</span>
+                <span className="inline sm:hidden">Exit Demo</span>
               </button>
             ) : (
               <button
                 onClick={() => setDemoMode(true)}
-                className="px-3 py-2 bg-[#FACC15] hover:bg-[#eab308] text-[#0b1f44] rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer shadow-sm border border-transparent"
+                className="px-3 py-2 bg-[#FACC15] hover:bg-[#eab308] text-[#0b1f44] rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer shadow-sm border border-transparent shrink-0"
               >
-                Demo Dashboard
+                <span className="hidden sm:inline">Demo Dashboard</span>
+                <span className="inline sm:hidden">Demo</span>
               </button>
             )}
 

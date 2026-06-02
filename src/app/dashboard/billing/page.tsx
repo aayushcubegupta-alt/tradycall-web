@@ -377,7 +377,7 @@ export default function BillingPage() {
           </div>
 
           {/* GROWTH CARD */}
-          <div className="bg-white border-2 border-[#FACC15] rounded-3xl p-6 sm:p-8 flex flex-col justify-between shadow-md relative scale-105 z-10">
+          <div className="bg-white border-2 border-[#FACC15] rounded-3xl p-6 sm:p-8 flex flex-col justify-between shadow-md relative md:scale-105 z-10">
             {/* MOST POPULAR BAR */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#FACC15] text-[#0B1F44] font-black text-[9px] uppercase tracking-widest px-4 py-1 rounded-full shadow-sm">
               Most Popular
