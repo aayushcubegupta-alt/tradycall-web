@@ -154,8 +154,10 @@ function VerifyEmailInner() {
             ]);
             
           if (dbError) {
-            console.error("Database Profiles Insert Warning:", dbError.message);
-            // We do not hard-block the user from dashboard entry if profiles table is not fully set up
+            console.error("Database Profiles Insert Error Details:", dbError);
+            setErrorMsg(`Verification succeeded, but profile creation failed: ${dbError.message} (Code: ${dbError.code || 'unknown'}). Please ensure your public.profiles table exists and the RLS insert policy allows authenticated users.`);
+            setIsLoading(false);
+            return;
           }
         }
       }
