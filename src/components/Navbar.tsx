@@ -113,10 +113,16 @@ export const Navbar: React.FC = () => {
           </nav>
 
           {/* Desktop CTA */}
-          <div className="hidden md:block">
-            <Link href="/demo">
-              <Button variant="primary" size="sm" className="rounded-md flex items-center gap-2">
-                <span className="text-[11px] font-black uppercase">Book a Demo</span>
+          <div className="hidden md:flex items-center space-x-5 lg:space-x-6">
+            <Link
+              href="/login"
+              className="text-sm font-semibold text-slate-300 hover:text-yellow-accent transition-colors duration-205"
+            >
+              Login
+            </Link>
+            <Link href="/signup">
+              <Button variant="primary" size="sm" className="rounded-md flex items-center gap-2 px-5 py-2.5">
+                <span className="text-[11px] font-black uppercase tracking-wider">Get Started</span>
               </Button>
             </Link>
           </div>
@@ -177,10 +183,17 @@ export const Navbar: React.FC = () => {
           })}
 
           {/* Mobile CTA */}
-          <div className="pt-6 border-t border-white/10 mt-4 px-0">
-            <Link href="/demo" onClick={() => setIsOpen(false)}>
-              <Button variant="primary" className="w-full justify-center text-sm font-black py-4">
-                Book a Free Demo
+          <div className="pt-8 border-t border-white/10 mt-8 px-0 flex flex-col gap-4">
+            <Link 
+              href="/login" 
+              onClick={() => setIsOpen(false)}
+              className="w-full text-center py-3.5 text-sm font-bold uppercase tracking-wider rounded-xl border border-white/10 text-slate-300 hover:text-yellow-accent hover:bg-white/5 transition-all duration-300"
+            >
+              Login
+            </Link>
+            <Link href="/signup" onClick={() => setIsOpen(false)}>
+              <Button variant="primary" className="w-full justify-center text-sm font-black py-4 rounded-xl">
+                Get Started
               </Button>
             </Link>
           </div>
