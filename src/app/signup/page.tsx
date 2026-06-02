@@ -3,9 +3,11 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Eye, EyeOff, Lock, Mail, User, Briefcase, ArrowRight, ShieldCheck } from "lucide-react";
 import Button from "@/components/ui/Button";
+import { supabase } from "@/lib/supabase";
 
 export default function SignupPage() {
   const [fullName, setFullName] = useState("");
@@ -15,14 +17,43 @@ export default function SignupPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMsg(null);
+
     if (password !== confirmPassword) {
-      alert("Passwords do not match!");
+      setErrorMsg("Passwords do not match!");
       return;
     }
-    // Auth logic not connected yet
+
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/dashboard`,
+          data: {
+            full_name: fullName,
+            business_name: businessName,
+          },
+        },
+      });
+
+      if (error) {
+        setErrorMsg(error.message);
+      } else {
+        router.push("/dashboard");
+      }
+    } catch (err: any) {
+      setErrorMsg(err?.message || "An unexpected error occurred during signup.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -73,6 +104,13 @@ export default function SignupPage() {
             </p>
           </div>
 
+          {/* Error message banner */}
+          {errorMsg && (
+            <div className="mb-6 p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-200 text-xs font-semibold leading-relaxed">
+              ⚠️ {errorMsg}
+            </div>
+          )}
+
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Full Name Field */}
@@ -82,7 +120,7 @@ export default function SignupPage() {
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
-                  <User className="w-4 h-4" />
+                  <User className="w-4.5 h-4.5" />
                 </div>
                 <input
                   type="text"
@@ -102,7 +140,7 @@ export default function SignupPage() {
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
-                  <Briefcase className="w-4 h-4" />
+                  <Briefcase className="w-4.5 h-4.5" />
                 </div>
                 <input
                   type="text"
@@ -122,7 +160,7 @@ export default function SignupPage() {
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
-                  <Mail className="w-4 h-4" />
+                  <Mail className="w-4.5 h-4.5" />
                 </div>
                 <input
                   type="email"
@@ -142,7 +180,7 @@ export default function SignupPage() {
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
-                  <Lock className="w-4 h-4" />
+                  <Lock className="w-4.5 h-4.5" />
                 </div>
                 <input
                   type={showPassword ? "text" : "password"}
@@ -157,7 +195,7 @@ export default function SignupPage() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-500 hover:text-slate-300 focus:outline-none cursor-pointer"
                 >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  {showPassword ? <EyeOff className="w-4.5 h-4.5" /> : <Eye className="w-4.5 h-4.5" />}
                 </button>
               </div>
             </div>
@@ -169,7 +207,7 @@ export default function SignupPage() {
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
-                  <Lock className="w-4 h-4" />
+                  <Lock className="w-4.5 h-4.5" />
                 </div>
                 <input
                   type={showConfirmPassword ? "text" : "password"}
@@ -184,7 +222,7 @@ export default function SignupPage() {
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-500 hover:text-slate-300 focus:outline-none cursor-pointer"
                 >
-                  {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  {showConfirmPassword ? <EyeOff className="w-4.5 h-4.5" /> : <Eye className="w-4.5 h-4.5" />}
                 </button>
               </div>
             </div>
@@ -201,9 +239,10 @@ export default function SignupPage() {
               <Button
                 type="submit"
                 variant="primary"
-                className="w-full justify-center flex items-center gap-2 font-black py-3.5 rounded-xl text-xs sm:text-sm uppercase tracking-wider shadow-lg shadow-yellow-accent/5 hover:shadow-yellow-accent/15"
+                disabled={isLoading}
+                className="w-full justify-center flex items-center gap-2 font-black py-3.5 rounded-xl text-xs sm:text-sm uppercase tracking-wider shadow-lg shadow-yellow-accent/5 hover:shadow-yellow-accent/15 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <span>Create your free account</span>
+                <span>{isLoading ? "Creating account..." : "Create your free account"}</span>
                 <ArrowRight className="w-4.5 h-4.5" />
               </Button>
             </div>
