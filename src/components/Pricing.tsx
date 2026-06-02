@@ -159,11 +159,6 @@ export const Pricing: React.FC = () => {
                   </p>
                 </div>
               </motion.div>
-              
-              {/* Floating Badge 2 */}
-              <div className="absolute top-4 right-4 bg-yellow-accent text-navy-base text-[10px] font-black tracking-wider uppercase px-3 py-1.5 rounded-full shadow-lg border border-yellow-hover/30">
-                100% Australian Owned
-              </div>
             </div>
 
             {/* Glowing Accent Dot behind frame */}
