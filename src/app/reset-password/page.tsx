@@ -11,7 +11,7 @@ import Button from "@/components/ui/Button";
 
 function ResetPasswordInner() {
   const [email, setEmail] = useState("");
-  const [otp, setOtp] = useState<string[]>(new Array(6).fill(""));
+  const [otp, setOtp] = useState<string[]>(new Array(8).fill(""));
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -50,7 +50,7 @@ function ResetPasswordInner() {
     setOtp(newOtp);
 
     // Auto-advance
-    if (index < 5 && inputRefs.current[index + 1]) {
+    if (index < 7 && inputRefs.current[index + 1]) {
       inputRefs.current[index + 1].focus();
     }
   };
@@ -77,12 +77,12 @@ function ResetPasswordInner() {
     e.preventDefault();
     const pastedData = e.clipboardData.getData("text").trim().replace(/[^0-9]/g, "");
     
-    if (pastedData.length >= 6) {
-      const newOtp = pastedData.substring(0, 6).split("");
+    if (pastedData.length >= 8) {
+      const newOtp = pastedData.substring(0, 8).split("");
       setOtp(newOtp);
       
-      if (inputRefs.current[5]) {
-        inputRefs.current[5].focus();
+      if (inputRefs.current[7]) {
+        inputRefs.current[7].focus();
       }
     }
   };
@@ -93,8 +93,8 @@ function ResetPasswordInner() {
     setSuccessMsg(null);
 
     const token = otp.join("");
-    if (token.length < 6) {
-      setErrorMsg("Please enter the complete 6-digit verification code.");
+    if (token.length < 8) {
+      setErrorMsg("Please enter the complete 8-digit verification code.");
       return;
     }
 
@@ -208,12 +208,12 @@ function ResetPasswordInner() {
           {/* Form */}
           <form onSubmit={handleReset} className="space-y-4">
             
-            {/* OTP Section */}
+             {/* OTP Section */}
             <div className="space-y-2">
               <label className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-slate-300 block text-left">
-                6-Digit Recovery Code
+                8-Digit Recovery Code
               </label>
-              <div className="flex justify-between items-center gap-2">
+              <div className="flex justify-between items-center gap-1 sm:gap-2">
                 {otp.map((data, index) => (
                   <input
                     key={index}
@@ -224,7 +224,7 @@ function ResetPasswordInner() {
                     onChange={(e) => handleOtpChange(e.target, index)}
                     onKeyDown={(e) => handleKeyDown(e, index)}
                     onPaste={index === 0 ? handlePaste : undefined}
-                    className="w-11 h-13 bg-white/5 border border-white/10 rounded-xl text-center text-lg font-black text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 font-mono transition-all"
+                    className="w-9 sm:w-11 h-11 sm:h-13 bg-white/5 border border-white/10 rounded-xl text-center text-base sm:text-lg font-black text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 font-mono transition-all"
                   />
                 ))}
               </div>

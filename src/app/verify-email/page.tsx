@@ -11,7 +11,7 @@ import Button from "@/components/ui/Button";
 
 function VerifyEmailInner() {
   const [email, setEmail] = useState("");
-  const [otp, setOtp] = useState<string[]>(new Array(6).fill(""));
+  const [otp, setOtp] = useState<string[]>(new Array(8).fill(""));
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -62,7 +62,7 @@ function VerifyEmailInner() {
     setOtp(newOtp);
 
     // Auto-advance to next input
-    if (index < 5 && inputRefs.current[index + 1]) {
+    if (index < 7 && inputRefs.current[index + 1]) {
       inputRefs.current[index + 1].focus();
     }
   };
@@ -91,13 +91,13 @@ function VerifyEmailInner() {
     e.preventDefault();
     const pastedData = e.clipboardData.getData("text").trim().replace(/[^0-9]/g, "");
     
-    if (pastedData.length >= 6) {
-      const newOtp = pastedData.substring(0, 6).split("");
+    if (pastedData.length >= 8) {
+      const newOtp = pastedData.substring(0, 8).split("");
       setOtp(newOtp);
       
       // Focus on last input
-      if (inputRefs.current[5]) {
-        inputRefs.current[5].focus();
+      if (inputRefs.current[7]) {
+        inputRefs.current[7].focus();
       }
     }
   };
@@ -108,8 +108,8 @@ function VerifyEmailInner() {
     setSuccessMsg(null);
 
     const token = otp.join("");
-    if (token.length < 6) {
-      setErrorMsg("Please enter the complete 6-digit code.");
+    if (token.length < 8) {
+      setErrorMsg("Please enter the complete 8-digit code.");
       return;
     }
 
@@ -245,8 +245,8 @@ function VerifyEmailInner() {
             <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
               Verify Your Email
             </h2>
-            <p className="text-slate-350 text-xs sm:text-sm font-semibold mt-2.5 leading-relaxed">
-              We&apos;ve sent a 6-digit verification code to<br />
+            <p className="text-slate-355 text-xs sm:text-sm font-semibold mt-2.5 leading-relaxed">
+              We&apos;ve sent an 8-digit verification code to<br />
               <strong className="text-white font-extrabold">{email || "your address"}</strong>
             </p>
           </div>
@@ -268,7 +268,7 @@ function VerifyEmailInner() {
           <form onSubmit={handleVerify} className="space-y-6">
             
             {/* Input boxes grid */}
-            <div className="flex justify-between items-center gap-2 sm:gap-3">
+            <div className="flex justify-between items-center gap-1 sm:gap-2">
               {otp.map((data, index) => (
                 <input
                   key={index}
@@ -279,7 +279,7 @@ function VerifyEmailInner() {
                   onChange={(e) => handleOtpChange(e.target, index)}
                   onKeyDown={(e) => handleKeyDown(e, index)}
                   onPaste={index === 0 ? handlePaste : undefined}
-                  className="w-12 h-14 bg-white/5 border border-white/10 rounded-xl text-center text-xl font-black text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 font-mono transition-all"
+                  className="w-9 sm:w-11 h-12 sm:h-14 bg-white/5 border border-white/10 rounded-xl text-center text-lg sm:text-xl font-black text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 font-mono transition-all"
                 />
               ))}
             </div>
