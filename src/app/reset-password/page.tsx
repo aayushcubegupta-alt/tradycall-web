@@ -213,7 +213,7 @@ function ResetPasswordInner() {
               <label className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-slate-300 block text-left">
                 8-Digit Recovery Code
               </label>
-              <div className="flex justify-between items-center gap-1 sm:gap-2">
+              <div className="grid grid-cols-8 gap-1.5 sm:gap-2 max-w-full">
                 {otp.map((data, index) => (
                   <input
                     key={index}
@@ -224,7 +224,7 @@ function ResetPasswordInner() {
                     onChange={(e) => handleOtpChange(e.target, index)}
                     onKeyDown={(e) => handleKeyDown(e, index)}
                     onPaste={index === 0 ? handlePaste : undefined}
-                    className="w-9 sm:w-11 h-11 sm:h-13 bg-white/5 border border-white/10 rounded-xl text-center text-base sm:text-lg font-black text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 font-mono transition-all"
+                    className="w-full h-11 sm:h-13 bg-white/5 border border-white/10 rounded-xl text-center text-base sm:text-lg font-black text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 font-mono transition-all min-w-0"
                   />
                 ))}
               </div>
