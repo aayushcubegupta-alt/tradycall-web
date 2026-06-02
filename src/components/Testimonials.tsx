@@ -86,11 +86,11 @@ export const Testimonials: React.FC = () => {
       {/* Endless review scrolling marquee container */}
       <div className="relative w-full overflow-hidden flex whitespace-nowrap select-none">
         {/* The scrolling track - continuously moving with pause on hover */}
-        <div className="flex animate-marquee gap-6 min-w-full items-stretch py-4 cursor-grab active:cursor-grabbing">
+        <div className="flex animate-marquee-fast md:animate-marquee gap-6 min-w-full items-stretch py-4 cursor-grab active:cursor-grabbing">
           {doubleReviews.map((review, i) => (
             <div
               key={i}
-              className="w-[340px] sm:w-[380px] flex-shrink-0 bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800 rounded-3xl p-6 shadow-sm hover:shadow-md hover:border-blue-500/20 dark:hover:border-blue-500/30 transition-all duration-300 flex flex-col justify-between whitespace-normal"
+              className="w-[300px] md:w-[380px] flex-shrink-0 bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800 rounded-3xl p-6 shadow-sm hover:shadow-md hover:border-blue-500/20 dark:hover:border-blue-500/30 transition-all duration-300 flex flex-col justify-between whitespace-normal"
             >
               {/* Header: Rating & Quote */}
               <div>

@@ -659,11 +659,11 @@ export default function BookDemoPage() {
 
           {/* Scrolling Marquee */}
           <div className="relative w-full overflow-hidden flex whitespace-nowrap select-none">
-            <div className="flex animate-marquee gap-6 min-w-full items-stretch py-4">
+            <div className="flex animate-marquee-fast md:animate-marquee gap-6 min-w-full items-stretch py-4">
               {[...demoReviews, ...demoReviews].map((review, i) => (
                 <div
                   key={i}
-                  className="w-[345px] sm:w-[390px] flex-shrink-0 bg-white border border-slate-200/80 rounded-3xl p-6 shadow-sm hover:shadow-lg hover:border-blue-500/20 transition-all duration-300 flex flex-col justify-between whitespace-normal text-left"
+                  className="w-[300px] md:w-[390px] flex-shrink-0 bg-white border border-slate-200/80 rounded-3xl p-6 shadow-sm hover:shadow-lg hover:border-blue-500/20 transition-all duration-300 flex flex-col justify-between whitespace-normal text-left"
                 >
                   <div>
                     <div className="flex items-center justify-between mb-4">

@@ -123,11 +123,11 @@ export const Pricing: React.FC = () => {
           </div>
 
           {/* Tradie Success Showcase (Right 6 Spans with new custom Tradie portrait) */}
-          <div className="lg:col-span-6 relative flex justify-center lg:justify-end">
+          <div className="w-full lg:col-span-6 relative flex justify-center lg:justify-end">
             
             {/* The Cinematic Blended Image Frame */}
             <div 
-              className="relative w-full max-w-[420px] h-[260px] sm:h-[380px] lg:h-[440px] rounded-2xl sm:rounded-[36px] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.04)] mx-auto"
+              className="relative w-full max-w-full sm:max-w-[420px] h-[260px] sm:h-[380px] lg:h-[440px] rounded-2xl sm:rounded-[36px] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.04)] mx-auto"
               style={{
                 maskImage: "linear-gradient(to bottom, black 82%, transparent 100%)",
                 WebkitMaskImage: "linear-gradient(to bottom, black 82%, transparent 100%)"
