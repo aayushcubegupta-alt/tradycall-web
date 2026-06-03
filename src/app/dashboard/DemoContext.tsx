@@ -12,6 +12,10 @@ interface DemoContextType {
   user: any;
   loadingProfile: boolean;
   isActive: boolean;
+  onboardingBooked: boolean;
+  setOnboardingBooked: (val: boolean) => Promise<void>;
+  showBookingModal: boolean;
+  setShowBookingModal: (val: boolean) => void;
 }
 
 const DemoContext = createContext<DemoContextType>({
@@ -23,6 +27,10 @@ const DemoContext = createContext<DemoContextType>({
   user: null,
   loadingProfile: true,
   isActive: false,
+  onboardingBooked: false,
+  setOnboardingBooked: async () => {},
+  showBookingModal: false,
+  setShowBookingModal: () => {},
 });
 
 const DEMO_BUSINESS_ID = "00000000-0000-0000-0000-000000000000";
@@ -57,6 +65,8 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
   const [fullName, setFullName] = useState("");
   const [businessName, setBusinessName] = useState("");
   const [businessId, setBusinessId] = useState<string | null>(null);
+  const [onboardingBookedState, setOnboardingBookedState] = useState(false);
+  const [showBookingModal, setShowBookingModal] = useState(false);
 
   // Fetch profiles and handle auto-provisioning
   useEffect(() => {
@@ -70,7 +80,7 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
           // Query profiles with linked business and is_active column
           const { data: profile, error: profileErr } = await supabase
             .from("profiles")
-            .select("*, businesses(name, is_active)")
+            .select("*, businesses(name, is_active, onboarding_booked)")
             .eq("user_id", authUser.id)
             .maybeSingle();
 
@@ -81,6 +91,7 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
               setBusinessId(profile.business_id);
               setBusinessName(profile.businesses.name || profile.business_name || "My Business");
               setIsActiveState(!!profile.businesses.is_active);
+              setOnboardingBookedState(!!profile.businesses.onboarding_booked);
             } else {
               // Auto-provision a new business record
               const businessNameText = profile.business_name || authUser.user_metadata?.business_name || "My Business";
@@ -101,16 +112,19 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
                 setBusinessId(newBus.id);
                 setBusinessName(newBus.name);
                 setIsActiveState(!!newBus.is_active);
+                setOnboardingBookedState(!!newBus.onboarding_booked);
               } else {
                 console.error("Auto-provisioning business failed:", busErr);
                 setBusinessName(businessNameText);
                 setIsActiveState(false);
+                setOnboardingBookedState(false);
               }
             }
           } else {
             // Fallback if profile doesn't exist
             setFullName(authUser.user_metadata?.full_name || "John");
             setBusinessName(authUser.user_metadata?.business_name || "ABC Plumbing");
+            setOnboardingBookedState(false);
           }
         } else {
           // Dev Mode Fallback: Use mock session
@@ -134,6 +148,23 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
     fetchProfileAndBusiness();
   }, []);
 
+  const setOnboardingBooked = async (val: boolean) => {
+    setOnboardingBookedState(val);
+    if (!isDemoMode && businessId) {
+      try {
+        const { error } = await supabase
+          .from("businesses")
+          .update({ onboarding_booked: val })
+          .eq("id", businessId);
+        if (error) {
+          console.error("Failed to update onboarding_booked in db:", error);
+        }
+      } catch (err) {
+        console.error("Error updating onboarding_booked:", err);
+      }
+    }
+  };
+
   const setDemoMode = (val: boolean) => {
     setIsDemoModeState(val);
     if (typeof window !== "undefined") {
@@ -154,6 +185,10 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
         user,
         loadingProfile,
         isActive: isDemoMode ? true : isActiveState,
+        onboardingBooked: isDemoMode ? true : onboardingBookedState,
+        setOnboardingBooked,
+        showBookingModal,
+        setShowBookingModal,
       }}
     >
       {children}

@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS public.businesses (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name TEXT NOT NULL,
     is_active BOOLEAN NOT NULL DEFAULT false,
+    onboarding_booked BOOLEAN NOT NULL DEFAULT false,
     created_at TIMESTAMPTZ DEFAULT now()
 );
 
@@ -62,9 +63,9 @@ CREATE TABLE IF NOT EXISTS public.recovery_activities (
 );
 
 -- 7. Insert the Dedicated Demo Business
-INSERT INTO public.businesses (id, name, is_active)
-VALUES ('00000000-0000-0000-0000-000000000000', 'ABC Plumbing Demo', true)
-ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, is_active = EXCLUDED.is_active;
+INSERT INTO public.businesses (id, name, is_active, onboarding_booked)
+VALUES ('00000000-0000-0000-0000-000000000000', 'ABC Plumbing Demo', true, false)
+ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, is_active = EXCLUDED.is_active, onboarding_booked = EXCLUDED.onboarding_booked;
 
 -- 8. Seed Sample Leads for Demo Business
 INSERT INTO public.leads (business_id, name, phone, service, status, value, location, source, summary, notes, last_contact, created_at)
@@ -412,8 +413,8 @@ BEGIN
     business_name_val := COALESCE(new.raw_user_meta_data->>'business_name', 'My Business');
 
     -- 1. Create a business row automatically
-    INSERT INTO public.businesses (name, is_active)
-    VALUES (business_name_val, false)
+    INSERT INTO public.businesses (name, is_active, onboarding_booked)
+    VALUES (business_name_val, false, false)
     RETURNING id INTO new_business_id;
 
     -- 2. Create the profile row and link the business_id

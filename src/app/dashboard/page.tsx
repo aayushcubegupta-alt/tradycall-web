@@ -59,8 +59,8 @@ const activityIconMap: Record<string, any> = {
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { businessId, isDemoMode, isActive } = useDemo();
-  console.log("DashboardPage render - isDemoMode:", isDemoMode, "businessId:", businessId, "isActive:", isActive);
+  const { businessId, isDemoMode, isActive, onboardingBooked, setShowBookingModal } = useDemo();
+  console.log("DashboardPage render - isDemoMode:", isDemoMode, "businessId:", businessId, "isActive:", isActive, "onboardingBooked:", onboardingBooked);
 
   const [leadsList, setLeadsList] = useState<any[]>([]);
   const [conversationsList, setConversationsList] = useState<any[]>([]);
@@ -261,27 +261,52 @@ export default function DashboardPage() {
       {!isActive && (
         <div className="absolute inset-0 z-50 flex items-center justify-center p-4 bg-slate-50/40 backdrop-blur-[3px] animate-fade-in min-h-[80vh]">
           <div className="bg-white border border-[#E2E8F0] rounded-[32px] p-8 sm:p-12 max-w-md w-full shadow-2xl text-center space-y-6 flex flex-col items-center animate-in fade-in zoom-in-95 duration-200">
-            <div className="w-16 h-16 rounded-2xl bg-[#FFF9E6] border border-[#FDE047] flex items-center justify-center text-[#CA8A04] shadow-sm shrink-0">
-              <ClipboardList className="w-8 h-8" />
-            </div>
-            <div className="space-y-2">
-              <h3 className="text-xl sm:text-2xl font-black text-[#0B1F44]">Welcome to TradyCall</h3>
-              <p className="text-slate-500 text-xs sm:text-sm font-semibold leading-relaxed">
-                Your workspace has been created successfully.
-              </p>
-              <p className="text-slate-500 text-xs sm:text-sm font-semibold leading-relaxed">
-                To activate missed-call recovery for your business, book a quick onboarding call with our team.
-              </p>
-            </div>
-            <button
-              onClick={() => router.push("/demo")}
-              className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer shadow-md border-none"
-            >
-              Book Onboarding Call
-            </button>
-            <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wide">
-              Typical setup time: 15 minutes
-            </span>
+            {onboardingBooked ? (
+              <>
+                <div className="w-16 h-16 rounded-2xl bg-green-50 border border-green-100 flex items-center justify-center text-green-500 shadow-sm shrink-0">
+                  <span className="text-2xl">✅</span>
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-xl sm:text-2xl font-black text-[#0B1F44]">Onboarding Scheduled</h3>
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-800">
+                    Awaiting Activation
+                  </span>
+                  <p className="text-slate-500 text-xs sm:text-sm font-semibold leading-relaxed pt-3">
+                    Your onboarding session has been booked successfully.
+                  </p>
+                  <p className="text-slate-500 text-xs sm:text-sm font-semibold leading-relaxed">
+                    Our team will contact you at the scheduled time and activate your workspace after setup.
+                  </p>
+                </div>
+                <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wide">
+                  Awaiting manual activation
+                </span>
+              </>
+            ) : (
+              <>
+                <div className="w-16 h-16 rounded-2xl bg-[#FFF9E6] border border-[#FDE047] flex items-center justify-center text-[#CA8A04] shadow-sm shrink-0">
+                  <ClipboardList className="w-8 h-8" />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-xl sm:text-2xl font-black text-[#0B1F44]">Welcome to TradyCall</h3>
+                  <p className="text-slate-500 text-xs sm:text-sm font-semibold leading-relaxed">
+                    Your workspace has been created successfully.
+                  </p>
+                  <p className="text-slate-500 text-xs sm:text-sm font-semibold leading-relaxed">
+                    To activate missed-call recovery for your business, book a quick onboarding call with our team.
+                  </p>
+                </div>
+                <button
+                  onClick={() => setShowBookingModal(true)}
+                  className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer shadow-md border-none"
+                >
+                  Book Onboarding Call
+                </button>
+                <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wide">
+                  Typical setup time: 15 minutes
+                </span>
+              </>
+            )}
           </div>
         </div>
       )}
@@ -355,7 +380,7 @@ export default function DashboardPage() {
               Connect Business Number
             </Button>
             <button
-              onClick={() => router.push("/demo")}
+              onClick={() => setShowBookingModal(true)}
               className="w-full sm:w-auto bg-white hover:bg-slate-50 text-[#0B1F44] border-2 border-[#0B1F44] px-6 py-3.5 rounded-xl font-black text-xs uppercase tracking-wider shadow-sm transition-all cursor-pointer font-bold text-center"
             >
               Book a Demo

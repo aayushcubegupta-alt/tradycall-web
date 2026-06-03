@@ -34,7 +34,19 @@ interface DashboardLayoutProps {
 }
 
 function DashboardLayoutContent({ children }: DashboardLayoutProps) {
-  const { isDemoMode, setDemoMode, businessName, fullName, loadingProfile, isActive } = useDemo();
+  const { 
+    isDemoMode, 
+    setDemoMode, 
+    businessName, 
+    fullName, 
+    loadingProfile, 
+    isActive, 
+    onboardingBooked, 
+    setOnboardingBooked, 
+    showBookingModal, 
+    setShowBookingModal,
+    user 
+  } = useDemo();
   const isForcedDemo = typeof window !== "undefined" && (window.location.hostname.startsWith("demo") || new URLSearchParams(window.location.search).get("demo") === "true");
   
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -44,9 +56,29 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [calendarMonth, setCalendarMonth] = useState(4); // May (0-indexed)
   const [calendarYear, setCalendarYear] = useState(2025);
+  const [iframeLoading, setIframeLoading] = useState(true);
 
   const router = useRouter();
   const pathname = usePathname();
+
+  // Reset iframe loading state when booking modal is opened
+  React.useEffect(() => {
+    if (showBookingModal) {
+      setIframeLoading(true);
+    }
+  }, [showBookingModal]);
+
+  // Listen to window postMessage events sent by embedded Calendly widget
+  React.useEffect(() => {
+    const handleCalendlyMessage = (e: MessageEvent) => {
+      if (e.data && e.data.event === "calendly.event_scheduled") {
+        console.log("Calendly booking success event received!");
+        setOnboardingBooked(true);
+      }
+    };
+    window.addEventListener("message", handleCalendlyMessage);
+    return () => window.removeEventListener("message", handleCalendlyMessage);
+  }, [setOnboardingBooked]);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -224,7 +256,7 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
 
         <div className="p-4 border-t border-[#E2E8F0] space-y-2.5">
           <button
-            onClick={() => router.push("/demo")}
+            onClick={() => { setMobileMenuOpen(false); setShowBookingModal(true); }}
             className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer border-none shadow-sm"
           >
             Book a Demo
@@ -270,7 +302,7 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
             
             {/* Book a Demo CTA */}
             <button
-              onClick={() => router.push("/demo")}
+              onClick={() => setShowBookingModal(true)}
               className="hidden sm:block px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer shadow-sm border border-transparent"
             >
               Book a Demo
@@ -503,19 +535,27 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
 
         {/* Global Pending Activation Status Banner */}
         {!isActive && (
-          <div className="bg-red-50 border-b border-red-100 px-4 py-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs font-bold text-red-800 shrink-0 text-left relative z-20 animate-fade-in shadow-sm">
+          <div className={`${onboardingBooked ? 'bg-[#DCFCE7] border-[#DCFCE7]' : 'bg-red-50 border-red-100'} border-b px-4 py-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs font-bold ${onboardingBooked ? 'text-green-800' : 'text-red-800'} shrink-0 text-left relative z-20 animate-fade-in shadow-sm`}>
             <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse shrink-0" />
-              <span>
-                <strong>Account Status: Pending Activation</strong> — Book your onboarding call to connect your business number and begin recovering missed jobs.
-              </span>
+              <span className={`w-2 h-2 rounded-full ${onboardingBooked ? 'bg-green-500' : 'bg-red-500'} animate-pulse shrink-0`} />
+              {onboardingBooked ? (
+                <span>
+                  <strong>Account Status: Onboarding Scheduled</strong> — Awaiting Activation. Our team will contact you at the scheduled time to setup and activate your workspace.
+                </span>
+              ) : (
+                <span>
+                  <strong>Account Status: Pending Activation</strong> — Book your onboarding call to connect your business number and begin recovering missed jobs.
+                </span>
+              )}
             </div>
-            <button
-              onClick={() => router.push("/demo")}
-              className="text-xs font-black text-blue-600 hover:text-blue-700 hover:underline shrink-0 bg-transparent border-none p-0 cursor-pointer text-left font-bold"
-            >
-              Book Onboarding Call →
-            </button>
+            {!onboardingBooked && (
+              <button
+                onClick={() => setShowBookingModal(true)}
+                className="text-xs font-black text-blue-600 hover:text-blue-700 hover:underline shrink-0 bg-transparent border-none p-0 cursor-pointer text-left font-bold"
+              >
+                Book Onboarding Call →
+              </button>
+            )}
           </div>
         )}
 
@@ -524,24 +564,49 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
           {(!isActive && pathname !== "/dashboard" && pathname !== "/dashboard/") ? (
             <div className="flex-grow flex flex-col items-center justify-center p-8 text-center min-h-[75vh] select-none">
               <div className="bg-white border border-[#E2E8F0] rounded-[32px] p-8 sm:p-12 max-w-md shadow-lg space-y-6 flex flex-col items-center animate-in fade-in zoom-in-95 duration-200">
-                <div className="w-16 h-16 rounded-2xl bg-red-50 border border-red-100 flex items-center justify-center text-red-500 shadow-sm shrink-0">
-                  <Lock className="w-8 h-8" />
-                </div>
-                <div className="space-y-2">
-                  <h3 className="text-xl font-black text-[#0B1F44]">Activation Required</h3>
-                  <p className="text-slate-500 text-xs sm:text-sm font-semibold leading-relaxed">
-                    Complete your onboarding call to activate TradyCall.
-                  </p>
-                </div>
-                <button
-                  onClick={() => router.push("/demo")}
-                  className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer shadow-sm border-none"
-                >
-                  Book Onboarding Call
-                </button>
-                <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wide">
-                  Typical setup time: 15 minutes
-                </span>
+                {onboardingBooked ? (
+                  <>
+                    <div className="w-16 h-16 rounded-2xl bg-green-50 border border-green-100 flex items-center justify-center text-green-500 shadow-sm shrink-0">
+                      <span className="text-2xl">✅</span>
+                    </div>
+                    <div className="space-y-2">
+                      <h3 className="text-xl font-black text-[#0B1F44]">Onboarding Scheduled</h3>
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        Awaiting Activation
+                      </span>
+                      <p className="text-slate-500 text-xs sm:text-sm font-semibold leading-relaxed pt-2">
+                        Your onboarding session has been booked successfully. Our team will contact you at the scheduled time and activate your workspace after setup.
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => router.push("/dashboard")}
+                      className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-green-600 hover:bg-green-700 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer shadow-sm border-none font-bold"
+                    >
+                      View Dashboard
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <div className="w-16 h-16 rounded-2xl bg-red-50 border border-red-100 flex items-center justify-center text-red-500 shadow-sm shrink-0">
+                      <Lock className="w-8 h-8" />
+                    </div>
+                    <div className="space-y-2">
+                      <h3 className="text-xl font-black text-[#0B1F44]">Activation Required</h3>
+                      <p className="text-slate-500 text-xs sm:text-sm font-semibold leading-relaxed">
+                        Complete your onboarding call to activate TradyCall.
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => setShowBookingModal(true)}
+                      className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer shadow-sm border-none"
+                    >
+                      Book Onboarding Call
+                    </button>
+                    <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wide">
+                      Typical setup time: 15 minutes
+                    </span>
+                  </>
+                )}
               </div>
             </div>
           ) : (
@@ -550,6 +615,76 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
         </main>
 
       </div>
+
+      {/* ─── 3. GLOBAL CALENDLY BOOKING MODAL ─── */}
+      {showBookingModal && (
+        <div className="fixed inset-0 bg-[#0F172A]/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white border border-[#E2E8F0] rounded-[32px] w-full max-w-3xl h-[85vh] max-h-[750px] shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="px-6 py-4 bg-[#0B1F44] border-b border-[#0B1F44] flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-2">
+                <Calendar className="w-5 h-5 text-[#FACC15]" />
+                <h3 className="text-sm sm:text-base font-black text-white uppercase tracking-wider">
+                  {onboardingBooked ? "Booking Confirmed" : "Book Onboarding Call"}
+                </h3>
+              </div>
+              <button 
+                onClick={() => setShowBookingModal(false)}
+                className="p-1.5 rounded-lg hover:bg-white/10 text-white cursor-pointer transition-colors border-none bg-transparent"
+              >
+                <X className="w-5 h-5 text-white" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="flex-grow relative overflow-y-auto min-h-0 bg-slate-50 flex flex-col">
+              {onboardingBooked ? (
+                <div className="flex-grow flex flex-col items-center justify-center p-8 sm:p-12 text-center space-y-6 animate-in fade-in duration-300">
+                  <div className="w-20 h-20 rounded-full bg-green-50 border border-green-100 flex items-center justify-center text-green-500 shadow-md shrink-0">
+                    <span className="text-3xl">✅</span>
+                  </div>
+                  <div className="space-y-3 max-w-md">
+                    <h2 className="text-xl sm:text-2xl font-black text-[#0B1F44]">
+                      Onboarding Call Scheduled
+                    </h2>
+                    <p className="text-slate-500 text-xs sm:text-sm font-semibold leading-relaxed">
+                      Your onboarding session has been booked successfully. Our team will contact you at the scheduled time and activate your workspace after setup.
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setShowBookingModal(false)}
+                    className="px-6 py-3.5 bg-green-600 hover:bg-green-700 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer shadow-md border-none font-bold"
+                  >
+                    View Dashboard
+                  </button>
+                </div>
+              ) : (
+                <div className="flex-grow flex flex-col relative w-full h-full">
+                  {/* Loading Spinner */}
+                  {iframeLoading && (
+                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-50 gap-3 z-10 animate-fade-in">
+                      <div className="w-10 h-10 border-4 border-[#0B1F44] border-t-[#FACC15] rounded-full animate-spin" />
+                      <p className="text-[10px] font-black uppercase tracking-widest text-[#64748B]">
+                        Loading Calendar...
+                      </p>
+                    </div>
+                  )}
+                  {/* Iframe */}
+                  <iframe
+                    src={`https://calendly.com/aayushcubegupta/tradycall-demo?background_color=f8fafc&text_color=0f172a&primary_color=2563eb&name=${encodeURIComponent(fullName)}&email=${encodeURIComponent(user?.email || "")}&embed_domain=${encodeURIComponent(typeof window !== "undefined" ? window.location.origin : "")}&embed_type=Inline`}
+                    width="100%"
+                    height="100%"
+                    frameBorder="0"
+                    title="Calendly Scheduler"
+                    className="flex-grow w-full h-full border-none"
+                    onLoad={() => setIframeLoading(false)}
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );
