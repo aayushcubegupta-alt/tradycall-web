@@ -22,6 +22,8 @@ import Button from "@/components/ui/Button";
 export default function BookDemoPage() {
   const router = useRouter();
   const [step, setStep] = useState(1);
+  const [isSavingLead, setIsSavingLead] = useState(false);
+  const [iframeLoading, setIframeLoading] = useState(true);
 
   // Form Fields State
   const [fullName, setFullName] = useState("");
@@ -35,8 +37,11 @@ export default function BookDemoPage() {
 
   useEffect(() => {
     const handleCalendlyMessage = (e: MessageEvent) => {
-      if (e.data && e.data.event === "calendly.event_scheduled") {
-        router.push("/demo-confirmed");
+      if (e.origin === "https://calendly.com" || e.origin.endsWith("calendly.com")) {
+        if (e.data && e.data.event === "calendly.event_scheduled") {
+          console.log("Calendly schedule confirmed. Redirecting...");
+          router.push("/demo-confirmed");
+        }
       }
     };
     window.addEventListener("message", handleCalendlyMessage);
@@ -83,12 +88,14 @@ export default function BookDemoPage() {
       return;
     }
 
+    setIsSavingLead(true);
     const success = await saveLead();
+    setIsSavingLead(false);
 
     if (success) {
       setStep(2);
     } else {
-      alert("Failed to save booking request.");
+      alert("Failed to save booking request. Please check your connection and try again.");
     }
   };
 
@@ -414,9 +421,23 @@ export default function BookDemoPage() {
                     </div>
 
                     <div className="pt-2">
-                      <Button type="submit" variant="primary" className="w-full justify-center flex items-center gap-2 font-black py-3.5 rounded-lg text-xs uppercase tracking-widest">
-                        Next: Choose a Time
-                        <ArrowRight className="w-4 h-4" />
+                      <Button 
+                        type="submit" 
+                        variant="primary" 
+                        disabled={isSavingLead}
+                        className="w-full justify-center flex items-center gap-2 font-black py-3.5 rounded-lg text-xs uppercase tracking-widest"
+                      >
+                        {isSavingLead ? (
+                          <>
+                            <div className="w-4 h-4 border-2 border-navy-base border-t-transparent rounded-full animate-spin" />
+                            <span>Saving details...</span>
+                          </>
+                        ) : (
+                          <>
+                            <span>Next: Choose a Time</span>
+                            <ArrowRight className="w-4 h-4" />
+                          </>
+                        )}
                       </Button>
                     </div>
                   </motion.form>
@@ -432,19 +453,26 @@ export default function BookDemoPage() {
                     <div className="flex justify-between items-center border-b border-white/5 pb-2">
                       <h3 className="text-sm font-black uppercase tracking-widest text-slate-400">Select date &amp; time</h3>
                       <button 
-                        onClick={() => setStep(1)} 
+                        onClick={() => { setStep(1); setIframeLoading(true); }} 
                         className="text-[10px] font-black uppercase text-blue-400 hover:text-blue-300 flex items-center gap-1 cursor-pointer bg-transparent border-none"
                       >
                         <ChevronLeft className="w-3.5 h-3.5" /> Back
                       </button>
                     </div>
 
-                    <div className="w-full min-h-[700px] rounded-2xl overflow-hidden bg-[#0b1f4d]">
+                    <div className="w-full min-h-[700px] rounded-2xl overflow-hidden bg-[#0b1f4d] relative">
+                      {iframeLoading && (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#0b1f4d] text-slate-400 font-bold text-xs uppercase tracking-widest gap-3 z-10">
+                          <div className="w-8 h-8 border-4 border-white/10 border-t-yellow-accent rounded-full animate-spin" />
+                          <span>Loading Calendar...</span>
+                        </div>
+                      )}
                       <iframe
-                        src={`https://calendly.com/aayushcubegupta/tradycall-demo?background_color=0b1f4d&text_color=ffffff&primary_color=facc15&hide_landing_page_details=1&hide_gdpr_banner=1&name=${encodeURIComponent(fullName)}&email=${encodeURIComponent(emailAddress)}&phone_number=${encodeURIComponent(phoneNumber)}`}
+                        src={`https://calendly.com/aayushcubegupta/tradycall-demo?background_color=0b1f4d&text_color=ffffff&primary_color=facc15&hide_landing_page_details=1&hide_gdpr_banner=1&name=${encodeURIComponent(fullName)}&email=${encodeURIComponent(emailAddress)}&phone_number=${encodeURIComponent(phoneNumber)}&embed_domain=${typeof window !== "undefined" ? window.location.hostname : ""}&embed_type=Inline`}
                         width="100%"
                         height="700"
                         frameBorder="0"
+                        onLoad={() => setIframeLoading(false)}
                         style={{ minWidth: "320px", minHeight: "700px" }}
                         className="w-full h-[700px] border-0"
                       />
