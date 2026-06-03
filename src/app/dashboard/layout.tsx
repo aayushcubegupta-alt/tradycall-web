@@ -329,6 +329,17 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
                   );
                 }
               }
+              if (!isActive) {
+                return (
+                  <button
+                    onClick={() => setDemoMode(true)}
+                    className="px-3 py-2 bg-[#FACC15] hover:bg-[#eab308] text-[#0b1f44] rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer shadow-sm border border-transparent shrink-0"
+                  >
+                    <span className="hidden sm:inline">Demo Dashboard</span>
+                    <span className="inline sm:hidden">Demo</span>
+                  </button>
+                );
+              }
               return null; // Customer accounts never see demo toggle
             })()}
 
