@@ -1,8 +1,9 @@
 "use client";
 
 import { supabase } from "@/lib/supabase";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Calendar,
@@ -11,7 +12,6 @@ import {
   Shield,
   Lock,
   ChevronLeft,
-  Check,
   Zap,
   Star
 } from "lucide-react";
@@ -20,9 +20,8 @@ import Footer from "@/components/Footer";
 import Button from "@/components/ui/Button";
 
 export default function BookDemoPage() {
+  const router = useRouter();
   const [step, setStep] = useState(1);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [bookingSuccess, setBookingSuccess] = useState(false);
 
   // Form Fields State
   const [fullName, setFullName] = useState("");
@@ -33,6 +32,16 @@ export default function BookDemoPage() {
   const [missedCalls, setMissedCalls] = useState("");
   const [staffCount, setStaffCount] = useState("");
   const [additionalInfo, setAdditionalInfo] = useState("");
+
+  useEffect(() => {
+    const handleCalendlyMessage = (e: MessageEvent) => {
+      if (e.data && e.data.event === "calendly.event_scheduled") {
+        router.push("/demo-confirmed");
+      }
+    };
+    window.addEventListener("message", handleCalendlyMessage);
+    return () => window.removeEventListener("message", handleCalendlyMessage);
+  }, [router]);
 
   const saveLead = async () => {
     const { error } = await supabase
@@ -58,22 +67,6 @@ export default function BookDemoPage() {
     return true;
   };
 
-  // Step 2 Time slots state
-  const [selectedDate, setSelectedDate] = useState<number | null>(null);
-  const [selectedTime, setSelectedTime] = useState<string | null>(null);
-
-  const datesList = [
-    { day: "Tue", num: 26, month: "May" },
-    { day: "Wed", num: 27, month: "May" },
-    { day: "Thu", num: 28, month: "May" },
-    { day: "Fri", num: 29, month: "May" },
-    { day: "Mon", num: 1, month: "Jun" }
-  ];
-
-  const timeSlots = [
-    "9:00 AM", "10:30 AM", "11:30 AM", "1:00 PM", "2:30 PM", "4:00 PM"
-  ];
-
   const handleNextStep = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -97,18 +90,6 @@ export default function BookDemoPage() {
     } else {
       alert("Failed to save booking request.");
     }
-  };
-
-  const handleConfirmBooking = () => {
-    if (selectedDate === null || !selectedTime) {
-      alert("Please select a date and a time slot for your demo.");
-      return;
-    }
-    setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setBookingSuccess(true);
-    }, 1500);
   };
 
   // 6 unique demo-page-only testimonials (different from homepage)
@@ -306,35 +287,7 @@ export default function BookDemoPage() {
               </div>
 
               <AnimatePresence mode="wait">
-                {bookingSuccess ? (
-                  /* ── SUCCESS STATE ── */
-                  <motion.div
-                    key="success"
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="text-center py-12 space-y-6"
-                  >
-                    <div className="w-16 h-16 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 flex items-center justify-center mx-auto shadow-lg">
-                      <Check className="w-8 h-8" />
-                    </div>
-                    <div className="space-y-2">
-                      <h3 className="text-xl sm:text-2xl font-black text-white">Demo Scheduled!</h3>
-                      <p className="text-slate-300 text-xs sm:text-sm font-semibold max-w-sm mx-auto leading-relaxed">
-                        Thanks, {fullName}! We&apos;ve sent a calendar invite and video link to <strong>{emailAddress}</strong>.
-                      </p>
-                    </div>
-                    <div className="pt-4">
-                      <Button
-                        variant="primary"
-                        onClick={() => { setStep(1); setBookingSuccess(false); }}
-                        className="px-6 py-2.5 rounded-lg text-xs font-black uppercase tracking-wider"
-                      >
-                        Book Another Demo
-                      </Button>
-                    </div>
-                  </motion.div>
-
-                ) : step === 1 ? (
+                {step === 1 ? (
                   /* ── STEP 1: YOUR DETAILS ── */
                   <motion.form
                     key="step1"
@@ -467,7 +420,6 @@ export default function BookDemoPage() {
                       </Button>
                     </div>
                   </motion.form>
-
                 ) : (
                   /* ── STEP 2: CALENDAR ── */
                   <motion.div
@@ -479,53 +431,23 @@ export default function BookDemoPage() {
                   >
                     <div className="flex justify-between items-center border-b border-white/5 pb-2">
                       <h3 className="text-sm font-black uppercase tracking-widest text-slate-400">Select date &amp; time</h3>
-                      <button onClick={() => setStep(1)} className="text-[10px] font-black uppercase text-blue-400 hover:text-blue-300 flex items-center gap-1 cursor-pointer">
+                      <button 
+                        onClick={() => setStep(1)} 
+                        className="text-[10px] font-black uppercase text-blue-400 hover:text-blue-300 flex items-center gap-1 cursor-pointer bg-transparent border-none"
+                      >
                         <ChevronLeft className="w-3.5 h-3.5" /> Back
                       </button>
                     </div>
 
-                    <div className="space-y-2 text-left">
-                      <label className="text-[10px] font-black text-slate-300 uppercase tracking-wide block">Select Date:</label>
-                      <div className="grid grid-cols-5 gap-2">
-                        {datesList.map((item, idx) => (
-                          <button
-                            key={idx}
-                            onClick={() => setSelectedDate(idx)}
-                            className={`p-2.5 rounded-xl border flex flex-col items-center justify-center gap-0.5 cursor-pointer hover:border-yellow-accent/60 transition-colors shadow-sm ${selectedDate === idx ? "bg-yellow-accent text-navy-base border-yellow-accent font-black" : "bg-white/5 border-white/10 text-slate-300 font-bold"}`}
-                          >
-                            <span className="text-[9px] uppercase tracking-wide opacity-80">{item.day}</span>
-                            <span className="text-base font-black">{item.num}</span>
-                            <span className="text-[8px] uppercase tracking-wider opacity-85">{item.month}</span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="space-y-2 pt-2 text-left">
-                      <label className="text-[10px] font-black text-slate-300 uppercase tracking-wide block">Select Time Slot (AEST):</label>
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                        {timeSlots.map((time, idx) => (
-                          <button
-                            key={idx}
-                            onClick={() => setSelectedTime(time)}
-                            className={`py-3 px-2 rounded-lg border text-center text-xs font-black cursor-pointer transition-all duration-200 ${selectedTime === time ? "bg-blue-600 text-white border-blue-600 shadow-md shadow-blue-500/10" : "bg-white/5 border-white/10 text-slate-300 hover:bg-white/10"}`}
-                          >
-                            {time}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="pt-4 border-t border-white/5 mt-6">
-                      <Button
-                        variant="primary"
-                        onClick={handleConfirmBooking}
-                        disabled={isSubmitting}
-                        className="w-full justify-center flex items-center gap-2 font-black py-4 rounded-lg text-xs uppercase tracking-widest"
-                      >
-                        {isSubmitting ? "Processing Booking..." : "Confirm Booking"}
-                        <ArrowRight className="w-4 h-4" />
-                      </Button>
+                    <div className="w-full min-h-[700px] rounded-2xl overflow-hidden bg-[#0b1f4d]">
+                      <iframe
+                        src={`https://calendly.com/aayushcubegupta/tradycall-demo?background_color=0b1f4d&text_color=ffffff&primary_color=facc15&hide_landing_page_details=1&hide_gdpr_banner=1&name=${encodeURIComponent(fullName)}&email=${encodeURIComponent(emailAddress)}&phone_number=${encodeURIComponent(phoneNumber)}`}
+                        width="100%"
+                        height="700"
+                        frameBorder="0"
+                        style={{ minWidth: "320px", minHeight: "700px" }}
+                        className="w-full h-[700px] border-0"
+                      />
                     </div>
                   </motion.div>
                 )}
