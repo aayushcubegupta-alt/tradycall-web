@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from "react";
 import Link from "next/link";
+import { trackBookDemoClick } from "@/lib/analytics";
 import { motion } from "framer-motion";
 import { ShieldAlert, CheckCircle2 } from "lucide-react";
 import Button from "./ui/Button";
@@ -147,7 +148,7 @@ export const RevenueCalculator: React.FC = () => {
             </div>
 
             <div className="pt-8">
-              <Link href="/demo" className="w-full">
+              <Link href="/demo" className="w-full" onClick={() => trackBookDemoClick("calculator")}>
                 <Button variant="primary" className="w-full py-4 text-xs font-black tracking-wider uppercase flex items-center justify-center gap-2">
                   <span>Start Recovering Revenue</span>
                 </Button>

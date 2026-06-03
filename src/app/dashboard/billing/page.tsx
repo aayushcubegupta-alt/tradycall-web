@@ -14,6 +14,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { useDemo } from "../DemoContext";
+import { trackBookDemoClick } from "@/lib/analytics";
 
 /* ── Invoice data ── */
 const invoices = [
@@ -370,7 +371,10 @@ export default function BillingPage() {
 
             <div className="pt-8">
               <button 
-                onClick={() => setShowBookingModal(true)}
+                onClick={() => {
+                  setShowBookingModal(true);
+                  trackBookDemoClick("dashboard_billing");
+                }}
                 className="w-full bg-white hover:bg-slate-50 text-[#0B1F44] border-2 border-[#0B1F44] font-black text-xs uppercase tracking-wider py-3.5 rounded-xl shadow-sm transition-all cursor-pointer"
               >
                 Book a Demo
@@ -424,7 +428,10 @@ export default function BillingPage() {
 
             <div className="pt-8">
               <button 
-                onClick={() => setShowBookingModal(true)}
+                onClick={() => {
+                  setShowBookingModal(true);
+                  trackBookDemoClick("dashboard_billing");
+                }}
                 className="w-full bg-[#FACC15] hover:bg-[#EAB308] text-[#0B1F44] font-black text-xs uppercase tracking-wider py-3.5 rounded-xl shadow-sm transition-all cursor-pointer border-none"
               >
                 Book a Demo
@@ -473,7 +480,10 @@ export default function BillingPage() {
 
             <div className="pt-8">
               <button 
-                onClick={() => setShowBookingModal(true)}
+                onClick={() => {
+                  setShowBookingModal(true);
+                  trackBookDemoClick("dashboard_billing");
+                }}
                 className="w-full bg-white hover:bg-slate-50 text-[#0B1F44] border-2 border-[#0B1F44] font-black text-xs uppercase tracking-wider py-3.5 rounded-xl shadow-sm transition-all cursor-pointer"
               >
                 Book a Demo

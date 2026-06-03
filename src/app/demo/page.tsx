@@ -4,6 +4,7 @@ import { supabase } from "@/lib/supabase";
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { sendUniqueGAEvent, getBookingSource } from "@/lib/analytics";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Calendar,
@@ -40,6 +41,14 @@ export default function BookDemoPage() {
       if (e.origin === "https://calendly.com" || e.origin.endsWith("calendly.com")) {
         if (e.data && e.data.event === "calendly.event_scheduled") {
           console.log("Calendly schedule confirmed. Redirecting...");
+          
+          const inviteeUri = e.data.payload?.invitee?.uri || "";
+          const dedupKey = inviteeUri ? `booking_${inviteeUri}` : undefined;
+          const source = getBookingSource("completed");
+
+          sendUniqueGAEvent("calendly_booking_completed", { source }, dedupKey);
+          sendUniqueGAEvent("generate_lead", { source }, dedupKey);
+
           router.push("/demo-confirmed");
         }
       }
@@ -47,6 +56,14 @@ export default function BookDemoPage() {
     window.addEventListener("message", handleCalendlyMessage);
     return () => window.removeEventListener("message", handleCalendlyMessage);
   }, [router]);
+
+  // Track when Calendly is loaded (step 2)
+  useEffect(() => {
+    if (step === 2) {
+      const source = getBookingSource("opened");
+      sendUniqueGAEvent("calendly_opened", { source });
+    }
+  }, [step]);
 
   // Prefill details if user is already authenticated
   useEffect(() => {
@@ -123,6 +140,7 @@ export default function BookDemoPage() {
     setIsSavingLead(false);
 
     if (success) {
+      sendUniqueGAEvent("contact_form_submitted", { form_type: "demo_request" });
       setStep(2);
     } else {
       alert("Failed to save booking request. Please check your connection and try again.");

@@ -26,6 +26,7 @@ import {
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Button from "@/components/ui/Button";
+import { trackBookDemoClick } from "@/lib/analytics";
 
 // Framer motion animation configs
 const fadeInUp = {
@@ -123,7 +124,7 @@ export default function IndustriesPage() {
                   transition={{ duration: 0.6, delay: 0.4 }}
                   className="flex flex-wrap items-center gap-4 pt-4"
                 >
-                  <Link href="/demo">
+                  <Link href="/demo" onClick={() => trackBookDemoClick("industries")}>
                     <Button variant="primary" className="flex items-center gap-2 font-black rounded-lg px-6 py-3.5 text-xs sm:text-sm">
                       <Calendar className="w-4 h-4" />
                       Book a Free Demo
@@ -332,7 +333,7 @@ export default function IndustriesPage() {
                       you're on-site or under the floor.
                     </p>
                   </div>
-                  <Link href="/demo" className="inline-flex items-center gap-1 text-xs font-black text-blue-600 hover:text-blue-700 pt-1 group/link">
+                  <Link href="/demo" onClick={() => trackBookDemoClick("industries")} className="inline-flex items-center gap-1 text-xs font-black text-blue-600 hover:text-blue-700 pt-1 group/link">
                     Learn more
                     <ArrowRight className="w-3.5 h-3.5 group-hover/link:translate-x-1 transition-transform" />
                   </Link>
@@ -367,7 +368,7 @@ export default function IndustriesPage() {
                       on the tools.
                     </p>
                   </div>
-                  <Link href="/demo" className="inline-flex items-center gap-1 text-xs font-black text-blue-600 hover:text-blue-700 pt-1 group/link">
+                  <Link href="/demo" onClick={() => trackBookDemoClick("industries")} className="inline-flex items-center gap-1 text-xs font-black text-blue-600 hover:text-blue-700 pt-1 group/link">
                     Learn more
                     <ArrowRight className="w-3.5 h-3.5 group-hover/link:translate-x-1 transition-transform" />
                   </Link>
@@ -402,7 +403,7 @@ export default function IndustriesPage() {
                       servicing and repairs.
                     </p>
                   </div>
-                  <Link href="/demo" className="inline-flex items-center gap-1 text-xs font-black text-blue-600 hover:text-blue-700 pt-1 group/link">
+                  <Link href="/demo" onClick={() => trackBookDemoClick("industries")} className="inline-flex items-center gap-1 text-xs font-black text-blue-600 hover:text-blue-700 pt-1 group/link">
                     Learn more
                     <ArrowRight className="w-3.5 h-3.5 group-hover/link:translate-x-1 transition-transform" />
                   </Link>
@@ -437,7 +438,7 @@ export default function IndustriesPage() {
                       into a booked job.
                     </p>
                   </div>
-                  <Link href="/demo" className="inline-flex items-center gap-1 text-xs font-black text-blue-600 hover:text-blue-700 pt-1 group/link">
+                  <Link href="/demo" onClick={() => trackBookDemoClick("industries")} className="inline-flex items-center gap-1 text-xs font-black text-blue-600 hover:text-blue-700 pt-1 group/link">
                     Learn more
                     <ArrowRight className="w-3.5 h-3.5 group-hover/link:translate-x-1 transition-transform" />
                   </Link>
@@ -472,7 +473,7 @@ export default function IndustriesPage() {
                       another job.
                     </p>
                   </div>
-                  <Link href="/demo" className="inline-flex items-center gap-1 text-xs font-black text-blue-600 hover:text-blue-700 pt-1 group/link">
+                  <Link href="/demo" onClick={() => trackBookDemoClick("industries")} className="inline-flex items-center gap-1 text-xs font-black text-blue-600 hover:text-blue-700 pt-1 group/link">
                     Learn more
                     <ArrowRight className="w-3.5 h-3.5 group-hover/link:translate-x-1 transition-transform" />
                   </Link>
@@ -506,7 +507,7 @@ export default function IndustriesPage() {
                       Capture renovation and new build enquiries while you're on-site.
                     </p>
                   </div>
-                  <Link href="/demo" className="inline-flex items-center gap-1 text-xs font-black text-blue-600 hover:text-blue-700 pt-1 group/link">
+                  <Link href="/demo" onClick={() => trackBookDemoClick("industries")} className="inline-flex items-center gap-1 text-xs font-black text-blue-600 hover:text-blue-700 pt-1 group/link">
                     Learn more
                     <ArrowRight className="w-3.5 h-3.5 group-hover/link:translate-x-1 transition-transform" />
                   </Link>
@@ -540,7 +541,7 @@ export default function IndustriesPage() {
                       Respond quickly to pest emergencies and secure more bookings.
                     </p>
                   </div>
-                  <Link href="/demo" className="inline-flex items-center gap-1 text-xs font-black text-blue-600 hover:text-blue-700 pt-1 group/link">
+                  <Link href="/demo" onClick={() => trackBookDemoClick("industries")} className="inline-flex items-center gap-1 text-xs font-black text-blue-600 hover:text-blue-700 pt-1 group/link">
                     Learn more
                     <ArrowRight className="w-3.5 h-3.5 group-hover/link:translate-x-1 transition-transform" />
                   </Link>
@@ -574,7 +575,7 @@ export default function IndustriesPage() {
                       Turn missed calls into seasonal bookings and keep your schedule full.
                     </p>
                   </div>
-                  <Link href="/demo" className="inline-flex items-center gap-1 text-xs font-black text-blue-600 hover:text-blue-700 pt-1 group/link">
+                  <Link href="/demo" onClick={() => trackBookDemoClick("industries")} className="inline-flex items-center gap-1 text-xs font-black text-blue-600 hover:text-blue-700 pt-1 group/link">
                     Learn more
                     <ArrowRight className="w-3.5 h-3.5 group-hover/link:translate-x-1 transition-transform" />
                   </Link>
@@ -686,7 +687,7 @@ export default function IndustriesPage() {
 
                 {/* Right side CTA Button and Social proof */}
                 <div className="shrink-0 flex flex-col items-center lg:items-end gap-4 w-full sm:w-auto">
-                  <Link href="/demo" className="w-full sm:w-auto">
+                  <Link href="/demo" className="w-full sm:w-auto" onClick={() => trackBookDemoClick("industries")}>
                     <Button variant="primary" size="lg" className="w-full sm:w-auto flex items-center justify-center gap-2 group font-black">
                       Book Your Free Demo
                       <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

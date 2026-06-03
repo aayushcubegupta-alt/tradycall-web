@@ -26,6 +26,7 @@ import {
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Button from "@/components/ui/Button";
+import { trackBookDemoClick } from "@/lib/analytics";
 
 // Framer motion variants
 const fadeInUp = {
@@ -290,7 +291,7 @@ export default function FAQPage() {
                     </p>
                   </div>
                   <div className="pt-2 w-full flex flex-col sm:flex-row items-center gap-4">
-                    <Link href="/demo" className="w-full sm:w-auto">
+                    <Link href="/demo" className="w-full sm:w-auto" onClick={() => trackBookDemoClick("faq")}>
                       <Button variant="primary" className="w-full justify-center flex items-center gap-2 text-xs font-black py-3 px-5 rounded-lg uppercase tracking-wider">
                         Book a Demo
                         <ArrowRight className="w-3.5 h-3.5" />
@@ -604,7 +605,7 @@ export default function FAQPage() {
 
                 {/* Right button & tradie portrait overlay details */}
                 <div className="shrink-0 flex flex-col lg:flex-row items-center gap-8 w-full lg:w-auto">
-                  <Link href="/demo" className="w-full sm:w-auto shrink-0 z-10">
+                  <Link href="/demo" className="w-full sm:w-auto shrink-0 z-10" onClick={() => trackBookDemoClick("faq")}>
                     <Button variant="primary" size="lg" className="w-full sm:w-auto flex items-center justify-center gap-2 font-black">
                       Book Your Free Demo
                       <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

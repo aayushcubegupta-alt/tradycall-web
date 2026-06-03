@@ -23,6 +23,7 @@ import {
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Button from "@/components/ui/Button";
+import { trackBookDemoClick } from "@/lib/analytics";
 
 // Framer motion variants
 const fadeInUp = {
@@ -241,7 +242,7 @@ export default function PricingPage() {
                 </div>
 
                 <div className="pt-8">
-                  <Link href="/demo" className="w-full">
+                  <Link href="/demo" className="w-full" onClick={() => trackBookDemoClick("pricing")}>
                     <Button variant="outline" className="w-full border-yellow-accent text-navy-base hover:bg-yellow-accent/10 hover:border-yellow-accent font-black py-3 rounded-lg text-xs tracking-wider uppercase">
                       Book a Demo
                     </Button>
@@ -294,7 +295,7 @@ export default function PricingPage() {
                 </div>
 
                 <div className="pt-8">
-                  <Link href="/demo" className="w-full">
+                  <Link href="/demo" className="w-full" onClick={() => trackBookDemoClick("pricing")}>
                     <Button variant="primary" className="w-full font-black py-3.5 rounded-lg text-xs tracking-wider uppercase">
                       Book a Demo
                     </Button>
@@ -342,7 +343,7 @@ export default function PricingPage() {
                 </div>
 
                 <div className="pt-8">
-                  <Link href="/demo" className="w-full">
+                  <Link href="/demo" className="w-full" onClick={() => trackBookDemoClick("pricing")}>
                     <Button variant="outline" className="w-full border-yellow-accent text-navy-base hover:bg-yellow-accent/10 hover:border-yellow-accent font-black py-3 rounded-lg text-xs tracking-wider uppercase">
                       Book a Demo
                     </Button>
@@ -479,7 +480,7 @@ export default function PricingPage() {
 
                 {/* Right CTA Button & Social Proof */}
                 <div className="shrink-0 flex flex-col items-center lg:items-end gap-4 w-full sm:w-auto">
-                  <Link href="/demo" className="w-full sm:w-auto">
+                  <Link href="/demo" className="w-full sm:w-auto" onClick={() => trackBookDemoClick("pricing")}>
                     <Button variant="primary" size="lg" className="w-full sm:w-auto flex items-center justify-center gap-2 font-black">
                       Book Your Free Demo
                       <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

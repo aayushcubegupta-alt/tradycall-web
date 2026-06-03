@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
+import { trackBookDemoClick } from "@/lib/analytics";
 import { Check, ShieldCheck, TrendingUp } from "lucide-react";
 import Button from "./ui/Button";
 import { motion, AnimatePresence } from "framer-motion";
@@ -249,12 +251,14 @@ export const Pricing: React.FC = () => {
 
                 {/* Bottom CTA Button area */}
                 <div className="p-8 pt-0 relative">
-                  <Button
-                    variant="secondary"
-                    className="w-full justify-center py-4 text-xs font-black tracking-widest uppercase shadow-md transition-all hover:scale-[1.02]"
-                  >
-                    {plan.ctaText}
-                  </Button>
+                  <Link href="/demo" className="w-full" onClick={() => trackBookDemoClick("pricing")}>
+                    <Button
+                      variant="secondary"
+                      className="w-full justify-center py-4 text-xs font-black tracking-widest uppercase shadow-md transition-all hover:scale-[1.02]"
+                    >
+                      {plan.ctaText}
+                    </Button>
+                  </Link>
                 </div>
 
               </motion.div>

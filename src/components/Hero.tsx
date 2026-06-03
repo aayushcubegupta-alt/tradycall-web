@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import Button from "./ui/Button";
 import { motion } from "framer-motion";
+import { trackBookDemoClick } from "@/lib/analytics";
 
 export const Hero: React.FC = () => {
   return (
@@ -56,7 +57,7 @@ export const Hero: React.FC = () => {
           transition={{ duration: 0.6, delay: 0.3 }}
           className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-8 sm:mb-10"
         >
-          <Link href="/demo" className="w-full sm:w-auto">
+          <Link href="/demo" className="w-full sm:w-auto" onClick={() => trackBookDemoClick("hero")}>
             <Button variant="primary" size="lg" className="w-full sm:w-auto flex items-center gap-2.5 group justify-center text-sm font-black rounded-lg px-8 py-4">
               <Calendar className="w-4 h-4 group-hover:scale-110 transition-transform" />
               Book a Free Demo

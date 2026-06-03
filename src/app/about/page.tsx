@@ -28,6 +28,7 @@ import {
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Button from "@/components/ui/Button";
+import { trackBookDemoClick } from "@/lib/analytics";
 
 // Framer motion variants for scroll animations
 const fadeInUp = {
@@ -607,7 +608,7 @@ export default function AboutUsPage() {
                 </p>
 
                 <div className="pt-2">
-                  <Link href="/demo">
+                  <Link href="/demo" onClick={() => trackBookDemoClick("about")}>
                     <Button variant="primary" className="flex items-center gap-2 group">
                       Book Your Free Demo
                       <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

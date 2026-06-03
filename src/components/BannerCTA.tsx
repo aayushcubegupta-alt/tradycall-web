@@ -1,6 +1,8 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
+import { trackBookDemoClick } from "@/lib/analytics";
 import { Headphones, ArrowRight } from "lucide-react";
 import Button from "./ui/Button";
 
@@ -39,14 +41,16 @@ export const BannerCTA: React.FC = () => {
 
           {/* Right Block: CTA button in black (matching screenshot) */}
           <div className="flex-shrink-0 w-full lg:w-auto">
-            <Button
-              variant="primary"
-              size="lg"
-              className="w-full lg:w-auto flex items-center justify-center gap-2.5 bg-black hover:bg-slate-900 border-black hover:border-slate-900 text-white font-extrabold text-sm tracking-wider uppercase px-8 py-4 shadow-xl hover:scale-[1.02]"
-            >
-              Book Your Free Demo
-              <ArrowRight className="w-4 h-4 text-yellow-accent stroke-[2.5]" />
-            </Button>
+            <Link href="/demo" className="w-full lg:w-auto" onClick={() => trackBookDemoClick("banner_cta")}>
+              <Button
+                variant="primary"
+                size="lg"
+                className="w-full lg:w-auto flex items-center justify-center gap-2.5 bg-black hover:bg-slate-900 border-black hover:border-slate-900 text-white font-extrabold text-sm tracking-wider uppercase px-8 py-4 shadow-xl hover:scale-[1.02]"
+              >
+                Book Your Free Demo
+                <ArrowRight className="w-4 h-4 text-yellow-accent stroke-[2.5]" />
+              </Button>
+            </Link>
           </div>
           
         </div>

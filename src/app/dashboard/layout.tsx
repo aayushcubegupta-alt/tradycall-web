@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { DemoProvider, useDemo } from "./DemoContext";
+import { sendUniqueGAEvent, trackBookDemoClick } from "@/lib/analytics";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -74,11 +75,24 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
       if (e.data && e.data.event === "calendly.event_scheduled") {
         console.log("Calendly booking success event received!");
         setOnboardingBooked(true);
+        
+        const inviteeUri = e.data.payload?.invitee?.uri || "";
+        const dedupKey = inviteeUri ? `booking_${inviteeUri}` : undefined;
+        
+        sendUniqueGAEvent("calendly_booking_completed", { source: "dashboard" }, dedupKey);
+        sendUniqueGAEvent("generate_lead", { source: "dashboard" }, dedupKey);
       }
     };
     window.addEventListener("message", handleCalendlyMessage);
     return () => window.removeEventListener("message", handleCalendlyMessage);
   }, [setOnboardingBooked]);
+
+  // Track when Calendly scheduler modal is opened
+  React.useEffect(() => {
+    if (showBookingModal) {
+      sendUniqueGAEvent("calendly_opened", { source: "dashboard" });
+    }
+  }, [showBookingModal]);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -256,7 +270,11 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
 
         <div className="p-4 border-t border-[#E2E8F0] space-y-2.5">
           <button
-            onClick={() => { setMobileMenuOpen(false); setShowBookingModal(true); }}
+            onClick={() => {
+              setMobileMenuOpen(false);
+              setShowBookingModal(true);
+              trackBookDemoClick("dashboard_mobile");
+            }}
             className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer border-none shadow-sm"
           >
             Book a Demo
@@ -302,7 +320,10 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
             
             {/* Book a Demo CTA */}
             <button
-              onClick={() => setShowBookingModal(true)}
+              onClick={() => {
+                setShowBookingModal(true);
+                trackBookDemoClick("dashboard_header");
+              }}
               className="hidden sm:block px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer shadow-sm border border-transparent"
             >
               Book a Demo
@@ -558,7 +579,10 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
             </div>
             {!onboardingBooked && (
               <button
-                onClick={() => setShowBookingModal(true)}
+                onClick={() => {
+                  setShowBookingModal(true);
+                  trackBookDemoClick("dashboard_pending_banner");
+                }}
                 className="text-xs font-black text-blue-600 hover:text-blue-700 hover:underline shrink-0 bg-transparent border-none p-0 cursor-pointer text-left font-bold"
               >
                 Book Onboarding Call →
@@ -605,7 +629,10 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
                       </p>
                     </div>
                     <button
-                      onClick={() => setShowBookingModal(true)}
+                      onClick={() => {
+                        setShowBookingModal(true);
+                        trackBookDemoClick("dashboard_lock_card");
+                      }}
                       className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer shadow-sm border-none"
                     >
                       Book Onboarding Call

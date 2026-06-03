@@ -25,6 +25,7 @@ import {
 import { supabase } from "@/lib/supabase";
 import Button from "@/components/ui/Button";
 import { useDemo } from "./DemoContext";
+import { trackBookDemoClick } from "@/lib/analytics";
 import { MOCK_LEADS, MOCK_CONVERSATIONS, MOCK_ACTIVITIES } from "./MockData";
 
 // Dynamic Lucide icons map
@@ -297,7 +298,10 @@ export default function DashboardPage() {
                   </p>
                 </div>
                 <button
-                  onClick={() => setShowBookingModal(true)}
+                  onClick={() => {
+                    setShowBookingModal(true);
+                    trackBookDemoClick("dashboard_welcome_lock_modal");
+                  }}
                   className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer shadow-md border-none"
                 >
                   Book Onboarding Call
@@ -380,7 +384,10 @@ export default function DashboardPage() {
               Connect Business Number
             </Button>
             <button
-              onClick={() => setShowBookingModal(true)}
+              onClick={() => {
+                setShowBookingModal(true);
+                trackBookDemoClick("dashboard_welcome_banner");
+              }}
               className="w-full sm:w-auto bg-white hover:bg-slate-50 text-[#0B1F44] border-2 border-[#0B1F44] px-6 py-3.5 rounded-xl font-black text-xs uppercase tracking-wider shadow-sm transition-all cursor-pointer font-bold text-center"
             >
               Book a Demo

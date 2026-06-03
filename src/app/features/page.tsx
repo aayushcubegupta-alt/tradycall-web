@@ -46,6 +46,7 @@ import {
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Button from "@/components/ui/Button";
+import { trackBookDemoClick } from "@/lib/analytics";
 
 // Framer motion animation variants
 const fadeInUp = {
@@ -1245,7 +1246,7 @@ export default function FeaturesPage() {
                 </div>
 
                 <div className="pt-8">
-                  <Link href="/demo" className="w-full">
+                  <Link href="/demo" className="w-full" onClick={() => trackBookDemoClick("features")}>
                     <Button variant="primary" className="w-full py-4 text-xs font-black tracking-wider uppercase flex items-center justify-center gap-2">
                       <span>Start Recovering Revenue</span>
                       <ArrowRight className="w-4 h-4 shrink-0" />
@@ -1336,7 +1337,7 @@ export default function FeaturesPage() {
 
                 {/* Right side gold CTAs and trust ratings */}
                 <div className="lg:col-span-5 flex flex-col items-center lg:items-end gap-5">
-                  <Link href="/demo" className="w-full sm:w-auto">
+                  <Link href="/demo" className="w-full sm:w-auto" onClick={() => trackBookDemoClick("features")}>
                     <Button variant="primary" size="lg" className="w-full sm:w-auto font-black py-4 uppercase text-xs tracking-wider flex items-center justify-center gap-2">
                       <span>Book Your Free Demo</span>
                       <ArrowRight className="w-4 h-4" />
