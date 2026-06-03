@@ -15,8 +15,15 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "TradyCall | Turn Missed Calls Into Booked Jobs | AI Receptionist for Tradies",
+  metadataBase: new URL("https://tradycall.com"),
+  title: {
+    default: "TradyCall | Turn Missed Calls Into Booked Jobs | AI Receptionist for Tradies",
+    template: "%s | TradyCall"
+  },
   description: "TradyCall is your AI receptionist that texts missed callers instantly, captures leads, and helps you win more jobs 24/7. Trusted by Sparkies, Plumbers, and Aussie tradies.",
+  alternates: {
+    canonical: "/"
+  }
 };
 
 export default function RootLayout({
