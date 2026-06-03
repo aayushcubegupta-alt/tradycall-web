@@ -17,13 +17,14 @@ import {
   PhoneCall, 
   ChevronDown, 
   ChevronUp,
-  ChevronLeft,
-  ChevronRight,
-  Calendar,
-  Menu,
-  X,
-  User,
+  ChevronLeft, 
+  ChevronRight, 
+  Calendar, 
+  Menu, 
+  X, 
+  User, 
   HelpCircle,
+  Lock,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { DemoProvider, useDemo } from "./DemoContext";
@@ -33,7 +34,8 @@ interface DashboardLayoutProps {
 }
 
 function DashboardLayoutContent({ children }: DashboardLayoutProps) {
-  const { isDemoMode, setDemoMode, businessName, fullName, loadingProfile } = useDemo();
+  const { isDemoMode, setDemoMode, businessName, fullName, loadingProfile, isActive } = useDemo();
+  const isForcedDemo = typeof window !== "undefined" && (window.location.hostname.startsWith("demo") || new URLSearchParams(window.location.search).get("demo") === "true");
   
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
@@ -274,24 +276,29 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
               Book a Demo
             </button>
 
-            {/* Demo Dashboard Trigger button */}
-            {isDemoMode ? (
-              <button
-                onClick={() => setDemoMode(false)}
-                className="px-3 py-2 bg-[#0b1f44] hover:bg-[#1a2d52] text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer shadow-sm border border-transparent shrink-0"
-              >
-                <span className="hidden sm:inline">Return to My Dashboard</span>
-                <span className="inline sm:hidden">Exit Demo</span>
-              </button>
-            ) : (
-              <button
-                onClick={() => setDemoMode(true)}
-                className="px-3 py-2 bg-[#FACC15] hover:bg-[#eab308] text-[#0b1f44] rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer shadow-sm border border-transparent shrink-0"
-              >
-                <span className="hidden sm:inline">Demo Dashboard</span>
-                <span className="inline sm:hidden">Demo</span>
-              </button>
-            )}
+            {/* Demo environment status badge or toggles */}
+            {(() => {
+              if (isDemoMode) {
+                if (isForcedDemo) {
+                  return (
+                    <span className="px-3.5 py-2 bg-[#FEF9C3] border border-[#FDE68A] text-[#CA8A04] rounded-xl text-xs font-black uppercase tracking-wider shadow-sm select-none shrink-0">
+                      Sales Demo
+                    </span>
+                  );
+                } else {
+                  return (
+                    <button
+                      onClick={() => setDemoMode(false)}
+                      className="px-3 py-2 bg-[#0b1f44] hover:bg-[#1a2d52] text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer shadow-sm border border-transparent shrink-0"
+                    >
+                      <span className="hidden sm:inline">Return to My Dashboard</span>
+                      <span className="inline sm:hidden">Exit Demo</span>
+                    </button>
+                  );
+                }
+              }
+              return null; // Customer accounts never see demo toggle
+            })()}
 
             {/* Interactive Date Indicator with Calendar Dropdown */}
             <div className="relative hidden sm:block">
@@ -483,18 +490,63 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
               <span className="w-2 h-2 rounded-full bg-[#EAB308] animate-pulse shrink-0" />
               <span>You are viewing sample data. Switch back to your business dashboard at any time.</span>
             </div>
+            {!isForcedDemo && (
+              <button
+                onClick={() => setDemoMode(false)}
+                className="text-xs font-black text-blue-600 hover:text-blue-700 hover:underline shrink-0 bg-transparent border-none p-0 cursor-pointer text-left"
+              >
+                Return to My Dashboard →
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* Global Pending Activation Status Banner */}
+        {!isActive && (
+          <div className="bg-red-50 border-b border-red-100 px-4 py-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs font-bold text-red-800 shrink-0 text-left relative z-20 animate-fade-in shadow-sm">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse shrink-0" />
+              <span>
+                <strong>Account Status: Pending Activation</strong> — Book your onboarding call to connect your business number and begin recovering missed jobs.
+              </span>
+            </div>
             <button
-              onClick={() => setDemoMode(false)}
-              className="text-xs font-black text-blue-600 hover:text-blue-700 hover:underline shrink-0 bg-transparent border-none p-0 cursor-pointer text-left"
+              onClick={() => window.open("https://calendly.com/tradycall/demo", "_blank")}
+              className="text-xs font-black text-blue-600 hover:text-blue-700 hover:underline shrink-0 bg-transparent border-none p-0 cursor-pointer text-left font-bold"
             >
-              Return to My Dashboard →
+              Book Onboarding Call →
             </button>
           </div>
         )}
 
         {/* Dashboard inner content canvas */}
         <main className="flex-grow overflow-y-auto">
-          {children}
+          {(!isActive && pathname !== "/dashboard" && pathname !== "/dashboard/") ? (
+            <div className="flex-grow flex flex-col items-center justify-center p-8 text-center min-h-[75vh] select-none">
+              <div className="bg-white border border-[#E2E8F0] rounded-[32px] p-8 sm:p-12 max-w-md shadow-lg space-y-6 flex flex-col items-center animate-in fade-in zoom-in-95 duration-200">
+                <div className="w-16 h-16 rounded-2xl bg-red-50 border border-red-100 flex items-center justify-center text-red-500 shadow-sm shrink-0">
+                  <Lock className="w-8 h-8" />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-xl font-black text-[#0B1F44]">Activation Required</h3>
+                  <p className="text-slate-500 text-xs sm:text-sm font-semibold leading-relaxed">
+                    Complete your onboarding call to activate TradyCall.
+                  </p>
+                </div>
+                <button
+                  onClick={() => window.open("https://calendly.com/tradycall/demo", "_blank")}
+                  className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer shadow-sm border-none"
+                >
+                  Book Onboarding Call
+                </button>
+                <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wide">
+                  Typical setup time: 15 minutes
+                </span>
+              </div>
+            </div>
+          ) : (
+            children
+          )}
         </main>
 
       </div>

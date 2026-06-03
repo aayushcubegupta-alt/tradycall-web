@@ -11,6 +11,7 @@ interface DemoContextType {
   fullName: string;
   user: any;
   loadingProfile: boolean;
+  isActive: boolean;
 }
 
 const DemoContext = createContext<DemoContextType>({
@@ -21,29 +22,41 @@ const DemoContext = createContext<DemoContextType>({
   fullName: "John",
   user: null,
   loadingProfile: true,
+  isActive: false,
 });
 
 const DEMO_BUSINESS_ID = "00000000-0000-0000-0000-000000000000";
 
 export function DemoProvider({ children }: { children: React.ReactNode }) {
-  const [isDemoMode, setIsDemoModeState] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
-  const [user, setUser] = useState<any>(null);
-  const [fullName, setFullName] = useState("");
-  const [businessName, setBusinessName] = useState("");
-  const [businessId, setBusinessId] = useState<string | null>(null);
+  const [isActiveState, setIsActiveState] = useState(false);
   const [loadingProfile, setLoadingProfile] = useState(true);
 
   // Initial mount load of demo mode setting
   useEffect(() => {
     setIsMounted(true);
     if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("tradycall_demo_mode");
-      if (saved === "true") {
+      const hostname = window.location.hostname;
+      const searchParams = new URLSearchParams(window.location.search);
+      const isDemoEnv = hostname.startsWith("demo") || searchParams.get("demo") === "true";
+      
+      if (isDemoEnv) {
         setIsDemoModeState(true);
+      } else {
+        const saved = localStorage.getItem("tradycall_demo_mode");
+        if (saved === "true") {
+          setIsDemoModeState(true);
+        }
       }
     }
   }, []);
+
+  // Keep other state variables
+  const [isDemoMode, setIsDemoModeState] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const [fullName, setFullName] = useState("");
+  const [businessName, setBusinessName] = useState("");
+  const [businessId, setBusinessId] = useState<string | null>(null);
 
   // Fetch profiles and handle auto-provisioning
   useEffect(() => {
@@ -54,10 +67,10 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
         if (authUser) {
           setUser(authUser);
           
-          // Query profiles with linked business
+          // Query profiles with linked business and is_active column
           const { data: profile, error: profileErr } = await supabase
             .from("profiles")
-            .select("*, businesses(name)")
+            .select("*, businesses(name, is_active)")
             .eq("user_id", authUser.id)
             .maybeSingle();
 
@@ -67,6 +80,7 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
             if (profile.businesses) {
               setBusinessId(profile.business_id);
               setBusinessName(profile.businesses.name || profile.business_name || "My Business");
+              setIsActiveState(!!profile.businesses.is_active);
             } else {
               // Auto-provision a new business record
               const businessNameText = profile.business_name || authUser.user_metadata?.business_name || "My Business";
@@ -86,9 +100,11 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
                   
                 setBusinessId(newBus.id);
                 setBusinessName(newBus.name);
+                setIsActiveState(!!newBus.is_active);
               } else {
                 console.error("Auto-provisioning business failed:", busErr);
                 setBusinessName(businessNameText);
+                setIsActiveState(false);
               }
             }
           } else {
@@ -101,6 +117,7 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
           setUser({ email: "developer@tradycall.com.au" });
           setFullName("John");
           setBusinessName("ABC Plumbing");
+          setIsActiveState(false);
         }
       } catch (err) {
         console.error("Failed to load user profile in layout:", err);
@@ -108,6 +125,7 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
         setUser({ email: "developer@tradycall.com.au" });
         setFullName("John");
         setBusinessName("ABC Plumbing");
+        setIsActiveState(false);
       } finally {
         setLoadingProfile(false);
       }
@@ -123,12 +141,7 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  // Avoid hydration issues by deferring context rendering until mounted
-  if (!isMounted) {
-    return <>{children}</>;
-  }
-
-  console.log("DemoProvider render - isDemoMode:", isDemoMode, "businessId:", isDemoMode ? DEMO_BUSINESS_ID : businessId);
+  console.log("DemoProvider render - isDemoMode:", isDemoMode, "businessId:", isDemoMode ? DEMO_BUSINESS_ID : businessId, "isActive:", isDemoMode ? true : isActiveState);
 
   return (
     <DemoContext.Provider
@@ -140,6 +153,7 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
         fullName,
         user,
         loadingProfile,
+        isActive: isDemoMode ? true : isActiveState,
       }}
     >
       {children}

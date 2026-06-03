@@ -2,6 +2,7 @@
 CREATE TABLE IF NOT EXISTS public.businesses (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name TEXT NOT NULL,
+    is_active BOOLEAN NOT NULL DEFAULT false,
     created_at TIMESTAMPTZ DEFAULT now()
 );
 
@@ -61,9 +62,9 @@ CREATE TABLE IF NOT EXISTS public.recovery_activities (
 );
 
 -- 7. Insert the Dedicated Demo Business
-INSERT INTO public.businesses (id, name)
-VALUES ('00000000-0000-0000-0000-000000000000', 'ABC Plumbing Demo')
-ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name;
+INSERT INTO public.businesses (id, name, is_active)
+VALUES ('00000000-0000-0000-0000-000000000000', 'ABC Plumbing Demo', true)
+ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, is_active = EXCLUDED.is_active;
 
 -- 8. Seed Sample Leads for Demo Business
 INSERT INTO public.leads (business_id, name, phone, service, status, value, location, source, summary, notes, last_contact, created_at)

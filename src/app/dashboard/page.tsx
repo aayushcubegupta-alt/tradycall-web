@@ -57,8 +57,8 @@ const activityIconMap: Record<string, any> = {
 };
 
 export default function DashboardPage() {
-  const { businessId, isDemoMode } = useDemo();
-  console.log("DashboardPage render - isDemoMode:", isDemoMode, "businessId:", businessId);
+  const { businessId, isDemoMode, isActive } = useDemo();
+  console.log("DashboardPage render - isDemoMode:", isDemoMode, "businessId:", businessId, "isActive:", isActive);
 
   const [leadsList, setLeadsList] = useState<any[]>([]);
   const [conversationsList, setConversationsList] = useState<any[]>([]);
@@ -254,7 +254,40 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-[1600px] mx-auto text-left animate-fade-in">
+    <div className="relative min-h-[80vh]">
+      {/* Centered Onboarding Activation Modal */}
+      {!isActive && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center p-4 bg-slate-50/40 backdrop-blur-[3px] animate-fade-in min-h-[80vh]">
+          <div className="bg-white border border-[#E2E8F0] rounded-[32px] p-8 sm:p-12 max-w-md w-full shadow-2xl text-center space-y-6 flex flex-col items-center animate-in fade-in zoom-in-95 duration-200">
+            <div className="w-16 h-16 rounded-2xl bg-[#FFF9E6] border border-[#FDE047] flex items-center justify-center text-[#CA8A04] shadow-sm shrink-0">
+              <ClipboardList className="w-8 h-8" />
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-xl sm:text-2xl font-black text-[#0B1F44]">Welcome to TradyCall</h3>
+              <p className="text-slate-500 text-xs sm:text-sm font-semibold leading-relaxed">
+                Your workspace has been created successfully.
+              </p>
+              <p className="text-slate-500 text-xs sm:text-sm font-semibold leading-relaxed">
+                To activate missed-call recovery for your business, book a quick onboarding call with our team.
+              </p>
+            </div>
+            <button
+              onClick={() => window.open("https://calendly.com/tradycall/demo", "_blank")}
+              className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer shadow-md border-none"
+            >
+              Book Onboarding Call
+            </button>
+            <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wide">
+              Typical setup time: 15 minutes
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* Main Dashboard Canvas - blur & disable interaction if inactive */}
+      <div className={`p-4 sm:p-6 lg:p-8 space-y-6 max-w-[1600px] mx-auto text-left animate-fade-in transition-all duration-300 ${
+        !isActive ? "pointer-events-none select-none blur-[2px] opacity-65" : ""
+      }`}>
 
       {/* ─── 1. "WELCOME TO TRADYCALL" ONBOARDING BANNER ─── */}
       <section className="bg-white border border-[#E2E8F0] rounded-[24px] p-6 shadow-sm flex flex-col xl:flex-row xl:items-center justify-between gap-6 relative">
@@ -682,6 +715,7 @@ export default function DashboardPage() {
 
       </section>
 
+      </div>
     </div>
   );
 }
