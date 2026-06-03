@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { 
   PhoneMissed, 
   User, 
@@ -57,6 +58,7 @@ const activityIconMap: Record<string, any> = {
 };
 
 export default function DashboardPage() {
+  const router = useRouter();
   const { businessId, isDemoMode, isActive } = useDemo();
   console.log("DashboardPage render - isDemoMode:", isDemoMode, "businessId:", businessId, "isActive:", isActive);
 
@@ -272,7 +274,7 @@ export default function DashboardPage() {
               </p>
             </div>
             <button
-              onClick={() => window.open("https://calendly.com/tradycall/demo", "_blank")}
+              onClick={() => router.push("/demo")}
               className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer shadow-md border-none"
             >
               Book Onboarding Call
@@ -353,7 +355,7 @@ export default function DashboardPage() {
               Connect Business Number
             </Button>
             <button
-              onClick={() => window.open("https://calendly.com/tradycall/demo", "_blank")}
+              onClick={() => router.push("/demo")}
               className="w-full sm:w-auto bg-white hover:bg-slate-50 text-[#0B1F44] border-2 border-[#0B1F44] px-6 py-3.5 rounded-xl font-black text-xs uppercase tracking-wider shadow-sm transition-all cursor-pointer font-bold text-center"
             >
               Book a Demo

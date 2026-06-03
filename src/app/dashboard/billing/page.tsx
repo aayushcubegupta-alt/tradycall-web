@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useRouter } from "next/navigation";
 import {
   Crown,
   CheckCircle2,
@@ -62,6 +63,7 @@ const plans = [
 ];
 
 export default function BillingPage() {
+  const router = useRouter();
   const { isDemoMode } = useDemo();
 
   const invoiceList = isDemoMode ? invoices : [];
@@ -368,7 +370,7 @@ export default function BillingPage() {
 
             <div className="pt-8">
               <button 
-                onClick={() => window.open("https://calendly.com/tradycall/demo", "_blank")}
+                onClick={() => router.push("/demo")}
                 className="w-full bg-white hover:bg-slate-50 text-[#0B1F44] border-2 border-[#0B1F44] font-black text-xs uppercase tracking-wider py-3.5 rounded-xl shadow-sm transition-all cursor-pointer"
               >
                 Book a Demo
@@ -422,7 +424,7 @@ export default function BillingPage() {
 
             <div className="pt-8">
               <button 
-                onClick={() => window.open("https://calendly.com/tradycall/demo", "_blank")}
+                onClick={() => router.push("/demo")}
                 className="w-full bg-[#FACC15] hover:bg-[#EAB308] text-[#0B1F44] font-black text-xs uppercase tracking-wider py-3.5 rounded-xl shadow-sm transition-all cursor-pointer border-none"
               >
                 Book a Demo
@@ -471,7 +473,7 @@ export default function BillingPage() {
 
             <div className="pt-8">
               <button 
-                onClick={() => window.open("https://calendly.com/tradycall/demo", "_blank")}
+                onClick={() => router.push("/demo")}
                 className="w-full bg-white hover:bg-slate-50 text-[#0B1F44] border-2 border-[#0B1F44] font-black text-xs uppercase tracking-wider py-3.5 rounded-xl shadow-sm transition-all cursor-pointer"
               >
                 Book a Demo

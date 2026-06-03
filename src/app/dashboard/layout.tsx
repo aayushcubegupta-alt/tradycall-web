@@ -224,7 +224,7 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
 
         <div className="p-4 border-t border-[#E2E8F0] space-y-2.5">
           <button
-            onClick={() => window.open("https://calendly.com/tradycall/demo", "_blank")}
+            onClick={() => router.push("/demo")}
             className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer border-none shadow-sm"
           >
             Book a Demo
@@ -270,7 +270,7 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
             
             {/* Book a Demo CTA */}
             <button
-              onClick={() => window.open("https://calendly.com/tradycall/demo", "_blank")}
+              onClick={() => router.push("/demo")}
               className="hidden sm:block px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer shadow-sm border border-transparent"
             >
               Book a Demo
@@ -511,7 +511,7 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
               </span>
             </div>
             <button
-              onClick={() => window.open("https://calendly.com/tradycall/demo", "_blank")}
+              onClick={() => router.push("/demo")}
               className="text-xs font-black text-blue-600 hover:text-blue-700 hover:underline shrink-0 bg-transparent border-none p-0 cursor-pointer text-left font-bold"
             >
               Book Onboarding Call →
@@ -534,7 +534,7 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
                   </p>
                 </div>
                 <button
-                  onClick={() => window.open("https://calendly.com/tradycall/demo", "_blank")}
+                  onClick={() => router.push("/demo")}
                   className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer shadow-sm border-none"
                 >
                   Book Onboarding Call

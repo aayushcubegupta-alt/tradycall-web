@@ -48,6 +48,36 @@ export default function BookDemoPage() {
     return () => window.removeEventListener("message", handleCalendlyMessage);
   }, [router]);
 
+  // Prefill details if user is already authenticated
+  useEffect(() => {
+    const prefillUserSession = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          if (user.email) setEmailAddress(user.email);
+          if (user.user_metadata?.full_name) setFullName(user.user_metadata.full_name);
+          if (user.user_metadata?.business_name) setBusinessName(user.user_metadata.business_name);
+
+          const { data: profile, error } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("user_id", user.id)
+            .maybeSingle();
+
+          if (profile) {
+            if (profile.full_name) setFullName(profile.full_name);
+            if (profile.business_name) setBusinessName(profile.business_name);
+            if (profile.email) setEmailAddress(profile.email);
+            if (profile.phone) setPhoneNumber(profile.phone);
+          }
+        }
+      } catch (err) {
+        console.error("Error prefilling user session:", err);
+      }
+    };
+    prefillUserSession();
+  }, []);
+
   const saveLead = async () => {
     const { error } = await supabase
       .from("demo_requests")
