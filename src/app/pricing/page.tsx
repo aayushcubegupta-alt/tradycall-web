@@ -41,6 +41,45 @@ const staggerContainer = {
   }
 };
 
+const pricingFaqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Do I need a new phone number?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. TradyCall works with your existing Australian business number. We configure call forwarding so that only missed calls are routed through our smart auto-reply system."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is there a lock-in contract?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No lock-in contracts. All of our plans operate on a flexible month-to-month subscription. You are free to cancel or adjust your tier at any time."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How quickly can I get started?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Setup is typically completed within 1-2 business days. Our Australian setup experts will configure your workflow, sync your number, and perform full diagnostics for you."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What's included in the setup fee?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "We handle the complete setup, configuration, and testing for you. This includes setting up your custom templates, connecting calendars, loading ABN data, and doing live call testing."
+      }
+    }
+  ]
+};
+
 export default function PricingPage() {
   // FAQ accordion open states (1-indexed matching questions)
   const [openFaq, setOpenFaq] = useState<number | null>(null);
@@ -122,6 +161,10 @@ export default function PricingPage() {
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(pricingFaqSchema) }}
+      />
       <Navbar />
 
       <main className="flex-grow">

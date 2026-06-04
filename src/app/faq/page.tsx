@@ -152,6 +152,125 @@ function HeroSection() {
 }
 
 
+const faqPageSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Do I need a new phone number to use TradyCall?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. TradyCall works with your existing Australian business number. We don't change your number or disrupt your current setup. Calls are briefly forwarded only when missed."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How quickly does the SMS get sent after a missed call?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "TradyCall sends the SMS reply within 15 seconds of detecting a missed call, ensuring you catch the customer while they are still actively searching for assistance."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What happens if the customer replies to the SMS?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "When a customer replies, their text is captured instantly. We forward it to your phone via SMS/email and log it on your dashboard, allowing you to reply immediately."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can my whole team see the leads and replies?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes! You can add multiple team members to your account, and set up notifications so that specific staff are alerted when new opportunities are recovered."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is TradyCall available after hours and on weekends?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Absolutely. TradyCall is active 24/7. You can set specific custom business-hours and after-hours text responses depending on when the call is missed."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does TradyCall capture missed calls?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "We use conditional call forwarding (busy, unanswered, unreachable). If you can't pick up, the carrier routes the call to our secure system for a split-second to capture the number."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What information is included in the lead?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Each lead contains the phone number, date/time, and the user's text reply. Our system uses AI to summarize their request (name, address, job type) into a neat brief."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I customise the SMS message?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes! You have full control over the wording, brand name, and qualifying questions. You can customize the templates directly inside your settings panel."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do notifications work?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "You can choose to get real-time alerts via SMS, email, or webhook. We can also sync leads directly into your job management tools."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I integrate TradyCall with other tools?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes! TradyCall integrates with popular industry apps like ServiceM8, Fergus, AroFlo, HubSpot, Google Calendar, and Zapier."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What's included in the setup fee?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The setup fee covers full custom onboarding. Our team handles template configuration, number forwarding, CRM syncing, and live call tests to ensure a smooth launch."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is there a lock-in contract?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No lock-in contracts. All of our plans operate on a flexible month-to-month subscription, giving you the freedom to adjust tiers or cancel at any time."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I change or cancel my plan later?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, you can upgrade, downgrade, or cancel your subscription at any time directly from your billing settings panel without any extra fees."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do you offer multi-location pricing?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes! For franchises or trade firms operating across multiple branches, we offer customized Pro packages with multi-location routing and volume discounts."
+      }
+    }
+  ]
+};
+
 export default function FAQPage() {
   const [searchQuery, setSearchQuery] = useState("");
   // Track open state for individual FAQ indices
@@ -255,6 +374,10 @@ export default function FAQPage() {
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqPageSchema) }}
+      />
       <Navbar />
 
       <main className="flex-grow">

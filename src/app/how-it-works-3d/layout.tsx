@@ -9,5 +9,32 @@ export const metadata: Metadata = {
 };
 
 export default function HowItWorks3DLayout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://tradycall.com"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "How It Works",
+        "item": "https://tradycall.com/how-it-works-3d"
+      }
+    ]
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      {children}
+    </>
+  );
 }

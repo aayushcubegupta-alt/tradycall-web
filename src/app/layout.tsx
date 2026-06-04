@@ -45,6 +45,64 @@ export const metadata: Metadata = {
   }
 };
 
+const organizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "TradyCall",
+  "url": "https://tradycall.com",
+  "logo": "https://tradycall.com/tradycall_logo_v2.png",
+  "sameAs": [
+    "https://www.linkedin.com/company/tradycall"
+  ]
+};
+
+const softwareAppSchema = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "TradyCall",
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Web",
+  "description": "AI-powered missed call recovery platform for Australian trades businesses.",
+  "url": "https://tradycall.com",
+  "offers": {
+    "@type": "AggregateOffer",
+    "priceCurrency": "AUD",
+    "lowPrice": "199",
+    "highPrice": "499",
+    "offerCount": "3",
+    "offers": [
+      {
+        "@type": "Offer",
+        "name": "Starter Plan",
+        "price": "199",
+        "priceCurrency": "AUD",
+        "url": "https://tradycall.com/pricing"
+      },
+      {
+        "@type": "Offer",
+        "name": "Growth Plan",
+        "price": "249",
+        "priceCurrency": "AUD",
+        "url": "https://tradycall.com/pricing"
+      },
+      {
+        "@type": "Offer",
+        "name": "Pro Plan",
+        "price": "499",
+        "priceCurrency": "AUD",
+        "url": "https://tradycall.com/pricing"
+      }
+    ]
+  }
+};
+
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "TradyCall",
+  "url": "https://tradycall.com"
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -55,6 +113,20 @@ export default function RootLayout({
       lang="en"
       className={`${plusJakarta.variable} ${inter.variable} h-full antialiased`}
     >
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareAppSchema) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+        />
+      </head>
       <body className="min-h-full flex flex-col font-body">{children}</body>
       <GoogleAnalytics gaId="G-MPPKFG8MQ3" />
     </html>
