@@ -1,11 +1,26 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Volume2, VolumeX } from "lucide-react";
 
 export default function BackgroundVideo() {
   const [isMuted, setIsMuted] = useState(true);
+  const [loadVideo, setLoadVideo] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    // Mount the sources after hydration so the poster registers as LCP first
+    setLoadVideo(true);
+  }, []);
+
+  useEffect(() => {
+    if (loadVideo && videoRef.current) {
+      videoRef.current.load();
+      videoRef.current.play().catch((err) => {
+        console.warn("Autoplay blocked or failed:", err);
+      });
+    }
+  }, [loadVideo]);
 
   const toggleMute = () => {
     if (videoRef.current) {
@@ -27,16 +42,17 @@ export default function BackgroundVideo() {
         poster="/marketing_poster.webp"
         preload="metadata"
       >
-        {/* Desktop Viewport Sources */}
-        <source src="/marketing_720p.webm" type="video/webm" media="(min-width: 769px)" />
-        <source src="/marketing_720p.mp4" type="video/mp4" media="(min-width: 769px)" />
-        
-        {/* Mobile Viewport Sources */}
-        <source src="/marketing_480p.webm" type="video/webm" media="(max-width: 768px)" />
-        <source src="/marketing_480p.mp4" type="video/mp4" media="(max-width: 768px)" />
-        
-        {/* Fallback Source */}
-        <source src="/marketing.mp4" type="video/mp4" />
+        {loadVideo && (
+          <>
+            {/* Desktop Viewport Sources */}
+            <source src="/marketing_720p.webm" type="video/webm" media="(min-width: 769px)" />
+            <source src="/marketing_720p.mp4" type="video/mp4" media="(min-width: 769px)" />
+            
+            {/* Mobile Viewport Sources (360p optimized size with sound) */}
+            <source src="/marketing_360p.webm" type="video/webm" media="(max-width: 768px)" />
+            <source src="/marketing_360p.mp4" type="video/mp4" media="(max-width: 768px)" />
+          </>
+        )}
       </video>
       
       {/* Premium Unmute Toggle Button (Icon Only) */}
