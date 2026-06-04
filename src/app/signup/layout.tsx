@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Get Started",
+  title: "Sign Up",
   description: "Join TradyCall today and start converting missed phone calls into booked jobs automatically.",
   alternates: {
     canonical: "/signup",

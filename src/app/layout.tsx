@@ -18,12 +18,30 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL("https://tradycall.com"),
   title: {
-    default: "TradyCall | Turn Missed Calls Into Booked Jobs | AI Receptionist for Tradies",
+    default: "TradyCall | Turn Missed Calls Into Booked Jobs",
     template: "%s | TradyCall"
   },
-  description: "TradyCall is your AI receptionist that texts missed callers instantly, captures leads, and helps you win more jobs 24/7. Trusted by Sparkies, Plumbers, and Aussie tradies.",
+  description: "Never lose another lead. TradyCall automatically responds to missed calls, captures customer details, and helps Australian tradies book more jobs 24/7.",
   alternates: {
     canonical: "/"
+  },
+  openGraph: {
+    title: "TradyCall | Turn Missed Calls Into Booked Jobs",
+    description: "Never lose another lead. TradyCall automatically responds to missed calls, captures customer details, and helps Australian tradies book more jobs 24/7.",
+    url: "https://tradycall.com",
+    siteName: "TradyCall",
+    locale: "en_AU",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "TradyCall | Turn Missed Calls Into Booked Jobs",
+    description: "Never lose another lead. TradyCall automatically responds to missed calls, captures customer details, and helps Australian tradies book more jobs 24/7.",
+  },
+  icons: {
+    icon: "/icon.png",
+    apple: "/apple-icon.png",
+    shortcut: "/favicon.ico",
   }
 };
 
