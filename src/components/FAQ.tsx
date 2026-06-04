@@ -192,7 +192,7 @@ export const FAQ: React.FC = () => {
                   >
                     {/* Active dynamic background blend */}
                     <div 
-                      className={`absolute inset-0 bg-yellow-accent/[0.02] dark:bg-yellow-accent/[0.01] backdrop-blur-[1px] transition-opacity duration-500 pointer-events-none ${
+                      className={`absolute inset-0 bg-yellow-accent/[0.02] dark:bg-yellow-accent/[0.01] transition-opacity duration-500 pointer-events-none ${
                         isOpen ? "opacity-100" : "opacity-0"
                       }`} 
                     />
