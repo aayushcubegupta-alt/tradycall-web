@@ -180,7 +180,7 @@ export default function PricingPage() {
           {/* Desktop Cover Image */}
           <div className="hidden md:block absolute inset-y-0 right-0 w-[65%] pointer-events-none z-0">
             <Image
-              src="/pricing_page_top_image.png"
+              src="/pricing_page_top_image.webp"
               alt="Pricing background"
               fill
               className="object-cover object-right"
@@ -195,7 +195,7 @@ export default function PricingPage() {
           {/* Mobile Backdrop Image */}
           <div className="block md:hidden absolute inset-0 pointer-events-none z-0 opacity-25">
             <Image
-              src="/pricing_page_top_image.png"
+              src="/pricing_page_top_image.webp"
               alt="Pricing background"
               fill
               sizes="100vw"

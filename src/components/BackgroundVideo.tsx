@@ -24,7 +24,18 @@ export default function BackgroundVideo() {
         muted
         loop
         playsInline
+        poster="/marketing_poster.webp"
+        preload="metadata"
       >
+        {/* Desktop Viewport Sources */}
+        <source src="/marketing_720p.webm" type="video/webm" media="(min-width: 769px)" />
+        <source src="/marketing_720p.mp4" type="video/mp4" media="(min-width: 769px)" />
+        
+        {/* Mobile Viewport Sources */}
+        <source src="/marketing_480p.webm" type="video/webm" media="(max-width: 768px)" />
+        <source src="/marketing_480p.mp4" type="video/mp4" media="(max-width: 768px)" />
+        
+        {/* Fallback Source */}
         <source src="/marketing.mp4" type="video/mp4" />
       </video>
       

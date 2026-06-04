@@ -180,15 +180,17 @@ export const HowItWorks: React.FC = () => {
                         
                         {/* Mobile-only responsive phone frame inline */}
                         <div className="mt-5 lg:hidden w-full max-w-[230px] aspect-[260/563] rounded-[32px] overflow-hidden border-[4px] border-[#1c1c1e] shadow-lg bg-black relative">
-                          <img
+                          <Image
                             src={
-                              step.id === 0 ? "/step1.png?v=3" :
-                              step.id === 1 ? "/step2.png?v=3" :
-                              step.id === 2 ? "/step3.png?v=3" :
-                              step.id === 3 ? "/step4.png?v=3" :
-                              "/step5.png?v=3"
+                              step.id === 0 ? "/step1.webp" :
+                              step.id === 1 ? "/step2.webp" :
+                              step.id === 2 ? "/step3.webp" :
+                              step.id === 3 ? "/step4.webp" :
+                              "/step5.webp"
                             }
                             alt={`TradyCall Step ${index + 1} Screen`}
+                            fill
+                            sizes="230px"
                             className="w-full h-full object-fill"
                           />
                         </div>
@@ -211,16 +213,19 @@ export const HowItWorks: React.FC = () => {
                 {/* Dynamic Content based on active step - loaded directly from realism images via CSS cross-fade */}
                 <div className="flex-grow w-full h-full relative">
                   {[0, 1, 2, 3, 4].map((stepIdx) => (
-                    <img
+                    <Image
                       key={stepIdx}
                       src={
-                        stepIdx === 0 ? "/step1.png?v=3" :
-                        stepIdx === 1 ? "/step2.png?v=3" :
-                        stepIdx === 2 ? "/step3.png?v=3" :
-                        stepIdx === 3 ? "/step4.png?v=3" :
-                        "/step5.png?v=3"
+                        stepIdx === 0 ? "/step1.webp" :
+                        stepIdx === 1 ? "/step2.webp" :
+                        stepIdx === 2 ? "/step3.webp" :
+                        stepIdx === 3 ? "/step4.webp" :
+                        "/step5.webp"
                       }
                       alt={`TradyCall Step ${stepIdx + 1} Screen Mockup`}
+                      fill
+                      sizes="260px"
+                      priority={stepIdx === 0}
                       className={`absolute inset-0 w-full h-full object-fill transition-all duration-500 ${
                         activeStep === stepIdx
                           ? "opacity-100 blur-0 scale-100"

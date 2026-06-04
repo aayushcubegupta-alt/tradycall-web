@@ -64,7 +64,7 @@ function HeroSection() {
       {/* Desktop Cover Image */}
       <div className="hidden md:block absolute inset-y-0 right-0 w-[65%] pointer-events-none z-0">
         <Image
-          src="/tradie_faq.png"
+          src="/tradie_faq.webp"
           alt="FAQ background"
           fill
           className="object-cover object-center md:object-right"
@@ -79,7 +79,7 @@ function HeroSection() {
       {/* Mobile Backdrop Image */}
       <div className="block md:hidden absolute inset-0 pointer-events-none z-0 opacity-35">
         <Image
-          src="/tradie_faq.png"
+          src="/tradie_faq.webp"
           alt="FAQ background"
           fill
           className="object-cover object-center"
@@ -738,7 +738,7 @@ export default function FAQPage() {
                   {/* Tradie folding arms backdrop */}
                   <div className="hidden lg:block w-[180px] rounded-xl overflow-hidden shadow-2xl border border-white/10 shrink-0 relative mt-4">
                     <Image
-                      src="/tradie_hero.png"
+                      src="/tradie_hero.webp"
                       alt="Tradie portrait"
                       width={200}
                       height={200}

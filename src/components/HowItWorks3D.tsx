@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useRef, useState, useEffect } from "react";
+import Image from "next/image";
 import { motion, useScroll, useTransform, AnimatePresence, useSpring } from "framer-motion";
 import { 
   PhoneMissed, 
@@ -161,9 +162,12 @@ export const HowItWorks3D: React.FC = () => {
           className="absolute inset-0 w-full h-full select-none pointer-events-none transition-all duration-300"
         >
           {/* Main Realistic 3D Backdrop Render */}
-          <img 
-            src="/how-it-works-3d.jpg" 
+          <Image 
+            src="/how-it-works-3d.webp" 
             alt="TradyCall 3D Cinematic Ecosystem" 
+            fill
+            priority
+            sizes="100vw"
             className="w-full h-full object-cover object-center"
           />
 

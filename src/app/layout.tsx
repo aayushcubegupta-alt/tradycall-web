@@ -114,6 +114,7 @@ export default function RootLayout({
       className={`${plusJakarta.variable} ${inter.variable} h-full antialiased`}
     >
       <head>
+        <link rel="preload" href="/marketing_poster.webp" as="image" type="image/webp" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}

@@ -61,7 +61,7 @@ export const Navbar: React.FC = () => {
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2 shrink-0">
             <Image
-              src="/tradycall_logo_v2.png"
+              src="/tradycall_logo_v2.webp"
               alt="TradyCall Logo"
               width={180}
               height={54}

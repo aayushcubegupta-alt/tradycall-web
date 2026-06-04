@@ -218,7 +218,7 @@ export default function BookDemoPage() {
           {/* Desktop Cover Image — right side, fades in from left */}
           <div className="hidden md:block absolute inset-y-0 right-0 w-[62%] pointer-events-none z-0">
             <Image
-              src="/demo_page_top_image.png"
+              src="/demo_page_top_image.webp"
               alt="Demo background"
               fill
               sizes="62vw"
@@ -234,7 +234,7 @@ export default function BookDemoPage() {
           {/* Mobile Backdrop Image */}
           <div className="block md:hidden absolute inset-0 pointer-events-none z-0 opacity-30">
             <Image
-              src="/demo_page_top_image.png"
+              src="/demo_page_top_image.webp"
               alt="Demo background"
               fill
               sizes="100vw"

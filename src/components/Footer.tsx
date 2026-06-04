@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -26,7 +24,7 @@ export const Footer: React.FC = () => {
           <div className="col-span-2 md:col-span-2 lg:col-span-6 space-y-4 sm:space-y-6">
             <Link href="/" className="inline-block transition-transform duration-300 hover:scale-102">
               <Image
-                src="/tradycall_logo_v2.png"
+                src="/tradycall_logo_v2.webp"
                 alt="TradyCall Logo"
                 width={180}
                 height={54}

@@ -131,7 +131,7 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
         <div className="px-6 py-5 bg-[#0B1F44] border-b border-[#0B1F44] flex items-center justify-center shrink-0">
           <Link href="/dashboard" className="flex items-center shrink-0">
             <Image
-              src="/tradycall_logo_v2.png"
+              src="/tradycall_logo_v2.webp"
               alt="TradyCall Logo"
               width={180}
               height={54}
@@ -230,7 +230,7 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
         <div className="px-5 py-4 bg-[#0B1F44] border-b border-[#0B1F44] flex items-center justify-between">
           <Link href="/dashboard" className="flex items-center shrink-0">
             <Image
-              src="/tradycall_logo_v2.png"
+              src="/tradycall_logo_v2.webp"
               alt="TradyCall Logo"
               width={150}
               height={45}

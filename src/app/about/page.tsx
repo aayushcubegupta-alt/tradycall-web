@@ -206,7 +206,7 @@ export default function AboutUsPage() {
           {/* Right-aligned Background Image covering the entire right half of the screen (Bleeds to top, bottom, and right edges on desktop) */}
           <div className="absolute top-0 right-0 bottom-0 w-full lg:w-[48%] xl:w-[50%] z-0 h-full hidden lg:block">
             <Image
-              src="/tradie_hero_v2.png"
+              src="/tradie_hero_v2.webp"
               alt="Australian tradesmen background"
               fill
               className="object-cover object-center"
@@ -278,7 +278,7 @@ export default function AboutUsPage() {
                     className="relative z-10 w-full overflow-hidden rounded-2xl"
                   >
                     <Image
-                      src="/tradie_hero_v2.png"
+                      src="/tradie_hero_v2.webp"
                       alt="Australian tradesmen smiling"
                       width={600}
                       height={400}
